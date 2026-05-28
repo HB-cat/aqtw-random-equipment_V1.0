@@ -1,0 +1,94 @@
+# 暗区突围无限_枪械数据库
+# 顺序：突击步枪、冲锋枪、霰弹枪、轻机枪、栓动步枪、射手步枪、卡宾枪、手枪
+
+weapons = [
+    # ========== 突击步枪 ==========
+    {"name": "AKS74U突击步枪", "type": "突击步枪", "level": 0, "price": 4400},
+    {"name": "SG550突击步枪", "type": "突击步枪", "level": 0, "price": 6700},
+    {"name": "AKM突击步枪", "type": "突击步枪", "level": 0, "price": 11000},
+    {"name": "AK74N突击步枪", "type": "突击步枪", "level": 0, "price": 9800},
+    {"name": "PCC-9", "type": "突击步枪", "level": 0, "price": 24000},
+    {"name": "FAL突击步枪", "type": "突击步枪", "level": 0, "price": 23000},
+    {"name": "ACE31突击步枪", "type": "突击步枪", "level": 0, "price": 17000},
+    {"name": "G3突击步枪", "type": "突击步枪", "level": 0, "price": 37000},
+    {"name": "SCAR-L突击步枪", "type": "突击步枪", "level": 0, "price": 18000},
+    {"name": "T951突击步枪", "type": "突击步枪", "level": 0, "price": 18000},
+    {"name": "M4A1突击步枪", "type": "突击步枪", "level": 0, "price": 61000},
+    {"name": "AK12突击步枪", "type": "突击步枪", "level": 0, "price": 44000},
+    {"name": "ZC807突击步枪", "type": "突击步枪", "level": 0, "price": 44000},
+    {"name": "AK102突击步枪", "type": "突击步枪", "level": 0, "price": 37000},
+    {"name": "AMB-17突击步枪", "type": "突击步枪", "level": 0, "price": 49000},
+    {"name": "MCX突击步枪", "type": "突击步枪", "level": 0, "price": 53000},
+    {"name": "DTMDR突击步枪", "type": "突击步枪", "level": 0, "price": 57000},
+    {"name": "T03突击步枪", "type": "突击步枪", "level": 0, "price": 66000},
+    {"name": "AR57突击步枪", "type": "突击步枪", "level": 0, "price": 86000},
+    {"name": "AN94突击步枪", "type": "突击步枪", "level": 0, "price": 69000},
+    {"name": "F2000突击步枪", "type": "突击步枪", "level": 0, "price": 140000},
+    {"name": "AEK突击步枪", "type": "突击步枪", "level": 0, "price": 93000},
+    {"name": "AUG突击步枪", "type": "突击步枪", "level": 0, "price": 130000},
+    {"name": "T191突击步枪", "type": "突击步枪", "level": 0, "price": 100000},
+    {"name": "H416突击步枪", "type": "突击步枪", "level": 0, "price": 170000},
+
+    # ========== 冲锋枪（已按最新价格修正） ==========
+    {"name": "QC61微型冲锋枪", "type": "冲锋枪", "level": 0, "price": 4400},
+    {"name": "UZI微型冲锋枪", "type": "冲锋枪", "level": 0, "price": 2400},
+    {"name": "MPF45微型冲锋枪", "type": "冲锋枪", "level": 0, "price": 4600},
+    {"name": "T79微型冲锋枪", "type": "冲锋枪", "level": 0, "price": 7400},
+    {"name": "MP40微型冲锋枪", "type": "冲锋枪", "level": 0, "price": 7600},
+    {"name": "M3A1微型冲锋枪", "type": "冲锋枪", "level": 0, "price": 7500},
+    {"name": "UMP45微型冲锋枪", "type": "冲锋枪", "level": 0, "price": 5700},
+    {"name": "MAC10微型冲锋枪", "type": "冲锋枪", "level": 0, "price": 12000},
+    {"name": "T85微型冲锋枪", "type": "冲锋枪", "level": 0, "price": 18000},
+    {"name": "MP5微型冲锋枪", "type": "冲锋枪", "level": 0, "price": 10000},
+    {"name": "Vector45微型冲锋枪", "type": "冲锋枪", "level": 0, "price": 11000},
+    {"name": "Vector9微型冲锋枪", "type": "冲锋枪", "level": 0, "price": 47000},
+    {"name": "PP19-01冲锋枪", "type": "冲锋枪", "level": 0, "price": 18000},
+    {"name": "MPX微型冲锋枪", "type": "冲锋枪", "level": 0, "price": 30000},
+    {"name": "P90微型冲锋枪", "type": "冲锋枪", "level": 0, "price": 100000},
+
+    # ========== 霰弹枪 ==========
+    {"name": "MP133弹枪", "type": "霰弹枪", "level": 0, "price": 6800},
+    {"name": "M870弹枪", "type": "霰弹枪", "level": 0, "price": 11000},
+    {"name": "SPR310双管猎枪", "type": "霰弹枪", "level": 0, "price": 11000},
+    {"name": "S12K弹枪", "type": "霰弹枪", "level": 0, "price": 16000},
+    {"name": "USAS12弹枪", "type": "霰弹枪", "level": 0, "price": 46000},
+
+    # ========== 轻机枪 ==========
+    {"name": "RPK16轻机枪", "type": "轻机枪", "level": 0, "price": 86000},
+
+    # ========== 栓动步枪 ==========
+    {"name": "莫辛纳甘栓动步枪", "type": "栓动步枪", "level": 0, "price": 44000},
+    {"name": "M24栓动步枪", "type": "栓动步枪", "level": 0, "price": 68000},
+    {"name": "SJ16栓动步枪", "type": "栓动步枪", "level": 0, "price": 160000},
+
+    # ========== 射手步枪 ==========
+    {"name": "SVDS射手步枪", "type": "射手步枪", "level": 0, "price": 39000},
+    {"name": "ML杠杆步枪", "type": "射手步枪", "level": 0, "price": 44000},
+    {"name": "M110射手步枪", "type": "射手步枪", "level": 0, "price": 60000},
+    {"name": "VSS射手步枪", "type": "射手步枪", "level": 0, "price": 43000},
+    {"name": "U191射手步枪", "type": "射手步枪", "level": 0, "price": 190000},
+    {"name": "MK14射手步枪", "type": "射手步枪", "level": 0, "price": 270000},
+
+    # ========== 卡宾枪 ==========
+    {"name": "SA85M卡宾枪", "type": "卡宾枪", "level": 0, "price": 6900},
+    {"name": "SKS卡宾枪", "type": "卡宾枪", "level": 0, "price": 6300},
+    {"name": "BM59卡宾枪", "type": "卡宾枪", "level": 0, "price": 7200},
+    {"name": "Mini14卡宾枪", "type": "卡宾枪", "level": 0, "price": 7900},
+    {"name": "M16卡宾枪", "type": "卡宾枪", "level": 0, "price": 9500},
+    {"name": "M14卡宾枪", "type": "卡宾枪", "level": 0, "price": 25000},
+    {"name": "SVTU卡宾枪", "type": "卡宾枪", "level": 0, "price": 23000},
+
+    # ========== 手枪 ==========
+    {"name": "M1911手枪", "type": "手枪", "level": 0, "price": 3600},
+    {"name": "T54手枪", "type": "手枪", "level": 0, "price": 3700},
+    {"name": "G17手枪", "type": "手枪", "level": 0, "price": 4900},
+    {"name": "M9A3手枪", "type": "手枪", "level": 0, "price": 3300},
+    {"name": "M45A1手枪", "type": "手枪", "level": 0, "price": 3200},
+    {"name": "T05手枪", "type": "手枪", "level": 0, "price": 9100},
+    {"name": "CZ52手枪", "type": "手枪", "level": 0, "price": 3200},
+    {"name": "沙漠之鹰手枪", "type": "手枪", "level": 0, "price": 9900},
+    {"name": "F57手枪", "type": "手枪", "level": 0, "price": 18000},
+    {"name": "G18C手枪", "type": "手枪", "level": 0, "price": 9000},
+    {"name": "MP9微型冲锋枪", "type": "手枪", "level": 0, "price": 9300},   # 游戏内归类为手枪
+    {"name": "黄金沙鹰手枪", "type": "手枪", "level": 0, "price": 16000},
+]

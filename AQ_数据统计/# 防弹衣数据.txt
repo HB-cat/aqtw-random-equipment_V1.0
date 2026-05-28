@@ -1,0 +1,38 @@
+# 防弹衣数据
+
+armors = [
+    {"name": "老式工兵防弹胸甲", "level": 1, "price": 7900},      
+    {"name": "旧安保防弹衣", "level": 1, "price": 8800},          
+    {"name": "老式防弹马甲", "level": 1, "price": 8800},          
+
+    {"name": "安保防弹衣", "level": 2, "price": 10000},           
+    {"name": "老式步兵防弹背心", "level": 2, "price": 20000},      
+    {"name": "220防弹衣", "level": 2, "price": 11000},     
+       
+    {"name": "H-LC轻型防弹衣", "level": 3, "price": 66000},       
+    {"name": "H-Tac特勤防弹衣", "level": 3, "price": 46000},      
+    {"name": "KN制式防弹衣", "level": 3, "price": 30000},         
+    {"name": "PCA350型防弹衣", "level": 3, "price": 38000},       
+    {"name": "KN突击防弹衣", "level": 3, "price": 80000},         
+    {"name": "标准特勤防弹衣", "level": 3, "price": 51000},       
+
+    {"name": "SEK堡垒防弹衣", "level": 4, "price": 100000},       
+    {"name": "6B 13防弹衣", "level": 4, "price": 120000},         
+    {"name": "6B23防弹衣", "level": 4, "price": 100000},          
+    {"name": "IND 401型防弹衣", "level": 4, "price": 100000},      
+    {"name": "斯巴达B型防弹衣", "level": 4, "price": 140000},      
+      
+    {"name": "926 复合防弹衣", "level": 5, "price": 250000},        
+    {"name": "H-LC战术防弹衣", "level": 5, "price": 280000},
+    {"name": "防卫者M4重装型防弹衣", "level": 5, "price": 280000},
+    {"name": "防卫者M4重装型防弹衣士官涂装", "level": 5, "price": 290000}, 
+    {"name": "IMTV 武士攻击型防弹衣", "level": 5, "price": 340000},  
+    {"name": "IMTV 武士标准防弹衣", "level": 5, "price": 330000},   
+    {"name": "IMTV 武士全面防护防弹衣", "level": 5, "price": 420000}, 
+    {"name": "BT6重型防弹衣", "level": 5, "price": 570000},        
+
+    {"name": "BT101战术防弹衣", "level": 6, "price": 1100000},     
+    {"name": "6B45重装型防弹衣", "level": 6, "price": 1100000},   
+    {"name": "治安官重型防弹衣", "level": 6, "price": 1000000},     
+    {"name": "KN 复合防弹衣", "level": 6, "price": 1500000},        
+]

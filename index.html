@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>暗区突围无限 - 装备随机生成器</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-red: #e33b1a;
+            --primary-red-hover: #ff4d2a;
+            --primary-red-dark: #a82b12;
+            --bg-dark: #0a0a0a;
+            --bg-panel: #141414;
+            --bg-card: #1a1a1a;
+            --border-color: #2a2a2a;
+            --border-red: #e33b1a40;
+            --text-primary: #f0f0f0;
+            --text-secondary: #888888;
+            --text-muted: #555555;
+            --glow-red: rgba(227, 59, 26, 0.4);
+            --glow-red-strong: rgba(227, 59, 26, 0.7);
+        }
+
+        body {
+            font-family: 'Rajdhani', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+            background:
+                radial-gradient(ellipse at top, #1a0a0a 0%, transparent 50%),
+                radial-gradient(ellipse at bottom, #0d0d0d 0%, transparent 50%),
+                linear-gradient(180deg, #0f0f0f 0%, #0a0a0a 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0px,
+                    transparent 1px,
+                    rgba(227, 59, 26, 0.02) 1px,
+                    rgba(227, 59, 26, 0.02) 2px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent 0px,
+                    transparent 1px,
+                    rgba(227, 59, 26, 0.02) 1px,
+                    rgba(227, 59, 26, 0.02) 2px
+                );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            text-align: center;
+            font-family: 'Black Ops One', 'Microsoft YaHei', sans-serif;
+            font-size: 3rem;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            margin-bottom: 5px;
+            text-shadow:
+                0 0 10px var(--glow-red),
+                0 0 20px var(--glow-red),
+                0 0 40px var(--glow-red-strong);
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        h1::before, h1::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-red), transparent);
+        }
+
+        h1::before {
+            left: -120px;
+        }
+
+        h1::after {
+            right: -120px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--primary-red);
+            margin-bottom: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        /* 模式选择 */
+        .mode-section {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.9), rgba(20, 20, 20, 0.95));
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 18px 35px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            min-width: 200px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .mode-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(227, 59, 26, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .mode-btn:hover::before {
+            left: 100%;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--primary-red);
+            color: var(--text-primary);
+            box-shadow: 0 0 20px var(--glow-red);
+            transform: translateY(-2px);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(145deg, rgba(227, 59, 26, 0.2), rgba(168, 43, 18, 0.3));
+            border-color: var(--primary-red);
+            color: var(--text-primary);
+            box-shadow: 0 0 30px var(--glow-red);
+        }
+
+        .mode-btn .price-range {
+            display: block;
+            font-size: 0.75rem;
+            margin-top: 6px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .mode-btn.active .price-range {
+            color: var(--primary-red);
+        }
+
+        /* 主要内容区 */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 面板 */
+        .panel {
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.9), rgba(20, 20, 20, 0.95));
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-red), transparent);
+            opacity: 0.5;
+        }
+
+        .panel::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-red), transparent);
+            opacity: 0.5;
+        }
+
+        .panel-title {
+            font-family: 'Black Ops One', 'Microsoft YaHei', sans-serif;
+            font-size: 1.1rem;
+            color: var(--primary-red);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .panel-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            background: linear-gradient(180deg, var(--primary-red), var(--primary-red-dark));
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--glow-red);
+        }
+
+        .panel-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--border-color), transparent);
+        }
+
+        /* 装备类别 */
+        .equipment-category {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            border-left: 3px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .equipment-category.enabled {
+            border-left-color: var(--primary-red);
+            background: rgba(227, 59, 26, 0.05);
+        }
+
+        .equipment-category.disabled {
+            opacity: 0.4;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .category-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: var(--primary-red);
+        }
+
+        .category-name {
+            flex: 1;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .category-type {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            padding: 3px 10px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 2px;
+            border: 1px solid var(--border-color);
+            letter-spacing: 1px;
+        }
+
+        .category-content {
+            padding-left: 32px;
+        }
+
+        .selection-modes {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .selection-mode {
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .selection-mode:hover {
+            background: rgba(227, 59, 26, 0.1);
+            border-color: var(--primary-red);
+        }
+
+        .selection-mode.active {
+            background: rgba(227, 59, 26, 0.2);
+            border-color: var(--primary-red);
+            color: var(--primary-red);
+            box-shadow: 0 0 10px var(--glow-red);
+        }
+
+        .equipment-select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: 'Rajdhani', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .equipment-select:focus {
+            outline: none;
+            border-color: var(--primary-red);
+            box-shadow: 0 0 15px var(--glow-red);
+        }
+
+        .equipment-select:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .equipment-select option {
+            background: #0a0a0a;
+            color: var(--text-primary);
+        }
+
+        /* 互斥选择 */
+        .exclusive-choice {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .exclusive-option {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .exclusive-option label {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .exclusive-option label:hover {
+            border-color: var(--primary-red);
+            background: rgba(227, 59, 26, 0.05);
+        }
+
+        .exclusive-option input[type="radio"] {
+            margin-right: 10px;
+            accent-color: var(--primary-red);
+        }
+
+        .exclusive-option input[type="radio"]:checked + span {
+            color: var(--primary-red);
+        }
+
+        .exclusive-option input[type="radio"]:checked ~ label {
+            border-color: var(--primary-red);
+            background: rgba(227, 59, 26, 0.1);
+            box-shadow: 0 0 10px var(--glow-red);
+        }
+
+        /* 生成按钮 */
+        .generate-section {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .generate-btn {
+            background: linear-gradient(145deg, var(--primary-red), var(--primary-red-dark));
+            border: none;
+            color: #fff;
+            padding: 20px 60px;
+            border-radius: 4px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            font-family: 'Black Ops One', 'Microsoft YaHei', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px var(--glow-red);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .generate-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .generate-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 40px var(--glow-red-strong);
+            background: linear-gradient(145deg, var(--primary-red-hover), var(--primary-red));
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 结果展示 */
+        .result-section {
+            margin-top: 20px;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .result-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 30%;
+            height: 2px;
+            background: var(--primary-red);
+            box-shadow: 0 0 10px var(--glow-red);
+        }
+
+        .total-price {
+            font-size: 1.5rem;
+            color: var(--primary-red);
+            font-weight: 700;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 2px;
+        }
+
+        .total-price span {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .equipment-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .equipment-card {
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.9), rgba(20, 20, 20, 0.95));
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            opacity: 0;
+            transform: translateX(-30px);
+            animation: slideIn 0.5s ease forwards;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .equipment-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary-red), var(--primary-red-dark));
+        }
+
+        .equipment-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(227, 59, 26, 0.05), transparent);
+            transition: width 0.3s ease;
+        }
+
+        .equipment-card:hover::after {
+            width: 100%;
+        }
+
+        .equipment-card:hover {
+            border-color: var(--primary-red);
+            box-shadow: 0 6px 25px var(--glow-red);
+            transform: translateX(5px);
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .card-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .card-name {
+            font-size: 1.05rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .card-price {
+            text-align: right;
+        }
+
+        .card-price .price {
+            font-size: 1.15rem;
+            color: var(--primary-red);
+            font-weight: 700;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .card-price .level {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* 警告信息 */
+        .warning-banner {
+            background: linear-gradient(145deg, rgba(138, 74, 58, 0.3), rgba(122, 58, 42, 0.4));
+            border: 1px solid rgba(227, 59, 26, 0.5);
+            border-radius: 4px;
+            padding: 15px 20px;
+            margin: 15px 0;
+            color: var(--text-primary);
+            display: none;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .warning-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #ff6a6a, var(--primary-red));
+        }
+
+        .warning-banner.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .warning-banner .warning-icon {
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .warning-banner .warning-text {
+            display: inline;
+            vertical-align: middle;
+        }
+
+        /* 冲突提示 */
+        .conflict-warning {
+            color: #ff6a6a;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: rgba(255, 106, 106, 0.08);
+            border-left: 2px solid #ff6a6a;
+            border-radius: 2px;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+                letter-spacing: 4px;
+            }
+
+            h1::before, h1::after {
+                display: none;
+            }
+
+            .mode-section {
+                gap: 10px;
+            }
+
+            .mode-btn {
+                min-width: 140px;
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+
+            .panel {
+                padding: 15px;
+            }
+
+            .generate-btn {
+                padding: 15px 40px;
+                font-size: 1.1rem;
+            }
+
+            .equipment-card {
+                padding: 12px 15px;
+            }
+
+            .card-name {
+                font-size: 0.95rem;
+            }
+
+            .card-price .price {
+                font-size: 1rem;
+            }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--primary-red-dark), var(--primary-red));
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--primary-red), var(--primary-red-hover));
+            box-shadow: 0 0 10px var(--glow-red);
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        /* 装饰性元素 - 角标 */
+        .corner-decoration {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary-red);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .corner-decoration.top-left {
+            top: 10px;
+            left: 10px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .corner-decoration.top-right {
+            top: 10px;
+            right: 10px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .corner-decoration.bottom-left {
+            bottom: 10px;
+            left: 10px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .corner-decoration.bottom-right {
+            bottom: 10px;
+            right: 10px;
+            border-left: none;
+            border-top: none;
+        }
+
+        /* 斜向分割线装饰 */
+        .diagonal-divider {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .diagonal-divider::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 200%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-red), transparent);
+            transform: rotate(-30deg);
+            opacity: 0.3;
+        }
+
+        /* 等级标签样式 */
+        .level-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: linear-gradient(145deg, var(--primary-red), var(--primary-red-dark));
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            border-radius: 2px;
+            letter-spacing: 1px;
+            box-shadow: 0 0 8px var(--glow-red);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="diagonal-divider"></div>
+        <h1>暗区突围无限</h1>
+        <p class="subtitle">AQTWWX Equipment Random Generator</p>
+        <div class="diagonal-divider"></div>
+
+        <!-- 模式选择 -->
+        <div class="mode-section">
+            <div class="mode-btn" data-mode="normal">
+                普通模式
+                <span class="price-range">&lt; 450,000</span>
+            </div>
+            <div class="mode-btn active" data-mode="blockade">
+                封锁模式
+                <span class="price-range">150,000 - 1,000,000</span>
+            </div>
+            <div class="mode-btn" data-mode="enhanced">
+                强化封锁模式
+                <span class="price-range">&ge; 450,000</span>
+            </div>
+        </div>
+
+        <!-- 警告横幅 -->
+        <div class="warning-banner" id="warningBanner">
+            <span class="warning-icon">⚠️</span>
+            <span class="warning-text" id="warningText"></span>
+        </div>
+
+        <!-- 生成按钮 -->
+        <div class="generate-section">
+            <button class="generate-btn" id="generateBtn">随机生成</button>
+        </div>
+
+        <div class="main-content">
+            <!-- 设置面板 -->
+            <div class="panel">
+                <div class="corner-decoration top-left"></div>
+                <div class="corner-decoration top-right"></div>
+                <div class="corner-decoration bottom-left"></div>
+                <div class="corner-decoration bottom-right"></div>
+                <h2 class="panel-title">装备设置</h2>
+
+                <!-- 防弹衣/弹挂 -->
+                <div class="equipment-category" data-category="body">
+                    <div class="category-header">
+                        <input type="checkbox" class="category-checkbox" id="bodyToggle">
+                        <span class="category-name">防弹衣 / 弹挂</span>
+                        <span class="category-type">互斥选择</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="exclusive-choice">
+                            <div class="exclusive-option">
+                                <label>
+                                    <input type="radio" name="bodyType" value="armored" id="armoredRigRadio">
+                                    <span>有甲弹挂</span>
+                                </label>
+                            </div>
+                            <div class="exclusive-option">
+                                <label>
+                                    <input type="radio" name="bodyType" value="separate" id="separateRadio">
+                                    <span>护甲 + 无甲弹挂</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="selection-modes">
+                            <div class="selection-mode active" data-mode="random">随机</div>
+                            <div class="selection-mode" data-mode="specified">指定</div>
+                        </div>
+                        <select class="equipment-select" id="bodySelect" disabled></select>
+                    </div>
+                </div>
+
+                <!-- 头盔 -->
+                <div class="equipment-category" data-category="helmet">
+                    <div class="category-header">
+                        <input type="checkbox" class="category-checkbox" id="helmetToggle">
+                        <span class="category-name">头盔</span>
+                        <span class="category-type">防护</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="selection-modes">
+                            <div class="selection-mode active" data-mode="random">随机</div>
+                            <div class="selection-mode" data-mode="specified">指定</div>
+                        </div>
+                        <select class="equipment-select" id="helmetSelect" disabled></select>
+                        <div class="conflict-warning" id="helmetConflict" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <!-- 面罩 -->
+                <div class="equipment-category" data-category="faceShield">
+                    <div class="category-header">
+                        <input type="checkbox" class="category-checkbox" id="faceShieldToggle">
+                        <span class="category-name">面罩</span>
+                        <span class="category-type">防护</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="selection-modes">
+                            <div class="selection-mode active" data-mode="random">随机</div>
+                            <div class="selection-mode" data-mode="specified">指定</div>
+                        </div>
+                        <select class="equipment-select" id="faceShieldSelect" disabled></select>
+                    </div>
+                </div>
+
+                <!-- 背包 -->
+                <div class="equipment-category" data-category="backpack">
+                    <div class="category-header">
+                        <input type="checkbox" class="category-checkbox" id="backpackToggle">
+                        <span class="category-name">背包</span>
+                        <span class="category-type">携行</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="selection-modes">
+                            <div class="selection-mode active" data-mode="random">随机</div>
+                            <div class="selection-mode" data-mode="specified">指定</div>
+                        </div>
+                        <select class="equipment-select" id="backpackSelect" disabled></select>
+                    </div>
+                </div>
+
+                <!-- 耳机 -->
+                <div class="equipment-category" data-category="ear">
+                    <div class="category-header">
+                        <input type="checkbox" class="category-checkbox" id="earToggle">
+                        <span class="category-name">耳机</span>
+                        <span class="category-type">听力</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="selection-modes">
+                            <div class="selection-mode active" data-mode="random">随机</div>
+                            <div class="selection-mode" data-mode="specified">指定</div>
+                        </div>
+                        <select class="equipment-select" id="earSelect" disabled></select>
+                        <div class="conflict-warning" id="earConflict" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <!-- 防毒面具 -->
+                <div class="equipment-category" data-category="gasMask">
+                    <div class="category-header">
+                        <input type="checkbox" class="category-checkbox" id="gasMaskToggle">
+                        <span class="category-name">防毒面具</span>
+                        <span class="category-type">防护</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="selection-modes">
+                            <div class="selection-mode active" data-mode="random">随机</div>
+                            <div class="selection-mode" data-mode="specified">指定</div>
+                        </div>
+                        <select class="equipment-select" id="gasMaskSelect" disabled></select>
+                    </div>
+                </div>
+
+                <!-- 枪械 -->
+                <div class="equipment-category" data-category="weapon">
+                    <div class="category-header">
+                        <input type="checkbox" class="category-checkbox" id="weaponToggle">
+                        <span class="category-name">枪械</span>
+                        <span class="category-type">武器</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="selection-modes">
+                            <div class="selection-mode active" data-mode="random">随机</div>
+                            <div class="selection-mode" data-mode="specified">指定</div>
+                        </div>
+                        <select class="equipment-select" id="weaponSelect" disabled></select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 结果面板 -->
+            <div class="panel">
+                <div class="corner-decoration top-left"></div>
+                <div class="corner-decoration top-right"></div>
+                <div class="corner-decoration bottom-left"></div>
+                <div class="corner-decoration bottom-right"></div>
+                <h2 class="panel-title">生成结果</h2>
+                <div class="result-section">
+                    <div class="result-header">
+                        <div class="total-price">
+                            <span>总战备值:</span>
+                            <span id="totalPrice">0</span>
+                        </div>
+                    </div>
+                    <div class="equipment-grid" id="equipmentGrid">
+                        <div class="empty-state">
+                            <div class="icon">🎯</div>
+                            <p>点击"随机生成"按钮生成装备</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 数据定义 ====================
+        const helmets_normal = [
+            {name: "凯尔斯消防头盔", type: "普通", level: 1, available_face_shields: [], price: 4200},
+            {name: "轻型安全头盔", type: "普通", level: 1, available_face_shields: [], price: 4700},
+            {name: "老式军用头盔", type: "普通", level: 2, available_face_shields: [], price: 10000},
+            {name: "老式钢盔", type: "普通", level: 2, available_face_shields: [], price: 6000},
+            {name: "安保头盔", type: "普通", level: 2, available_face_shields: [], price: 12000},
+            {name: "PAS标准头盔", type: "普通", level: 3, available_face_shields: [], price: 6600},
+            {name: "PAS2型头盔", type: "普通", level: 3, available_face_shields: [], price: 25000},
+            {name: "F70战术头盔", type: "普通", level: 3, available_face_shields: ["DK5通用防弹面罩", "DK6安保防弹面罩"], price: 41000},
+            {name: "6B4型头盔", type: "普通", level: 3, available_face_shields: [], price: 36000},
+            {name: "6B4型头盔小队涂装", type: "普通", level: 3, available_face_shields: [], price: 36000},
+            {name: "6B5型头盔", type: "普通", level: 3, available_face_shields: [], price: 32000},
+            {name: "IND战术头盔", type: "普通", level: 4, available_face_shields: ["DK5通用防弹面罩", "DK6安保防弹面罩"], price: 57000},
+            {name: "IND战术头盔雪山版", type: "普通", level: 4, available_face_shields: ["DK5通用防弹面罩", "DK6安保防弹面罩"], price: 60000},
+            {name: "IND200头盔", type: "普通", level: 4, available_face_shields: ["DK5通用防弹面罩", "DK6安保防弹面罩"], price: 50000},
+            {name: "F80战术头盔", type: "普通", level: 4, available_face_shields: [], price: 49000},
+            {name: "KSS战术头盔", type: "普通", level: 4, available_face_shields: ["DK5通用防弹面罩", "DK6安保防弹面罩", "DK8军用防弹面罩"], price: 100000},
+            {name: "KSS2型头盔", type: "普通", level: 4, available_face_shields: ["DK5通用防弹面罩", "DK6安保防弹面罩", "DK8军用防弹面罩"], price: 100000},
+            {name: "FA突击战术头盔", type: "普通", level: 5, available_face_shields: [], price: 250000},
+            {name: "03重型战术头盔", type: "普通", level: 5, available_face_shields: ["DK5通用防弹面罩", "DK6安保防弹面罩", "DK8军用防弹面罩"], price: 330000},
+            {name: "IND50重型战术头盔", type: "普通", level: 6, available_face_shields: ["DK5通用防弹面罩", "DK6安保防弹面罩", "DK8军用防弹面罩"], price: 480000},
+            {name: "AS200重型战术头盔", type: "普通", level: 6, available_face_shields: ["DK7高级防弹面罩"], price: 500000},
+        ];
+
+        const helmets_sealed = [
+            {name: "摩托车头盔", type: "自闭头", level: 1, available_face_shields: [], price: 5000},
+            {name: "坦克兵防护帽", type: "自闭头", level: 1, available_face_shields: [], price: 5200},
+            {name: "飞行员头盔", type: "自闭头", level: 2, available_face_shields: [], price: 12000},
+            {name: "安保防暴头盔", type: "自闭头", level: 2, available_face_shields: [], price: 12000},
+            {name: "SH12军用头盔", type: "自闭头", level: 3, available_face_shields: [], price: 48000},
+            {name: "56K型直升机头盔", type: "自闭头", level: 4, available_face_shields: [], price: 120000},
+            {name: "SH40军用头盔", type: "自闭头", level: 4, available_face_shields: ["SH60面罩"], price: 21000},
+            {name: "SH18军用头盔", type: "自闭头", level: 4, available_face_shields: [], price: 45000},
+            {name: "AN95重型防爆头盔", type: "自闭头", level: 5, available_face_shields: ["AN95军用防弹面罩"], price: 400000},
+            {name: "SH马斯卡2型头盔", type: "自闭头", level: 5, available_face_shields: ["SH马斯卡面罩"], price: 230000},
+            {name: "SH60军用头盔", type: "自闭头", level: 5, available_face_shields: ["SH60面罩"], price: 160000},
+            {name: "SH50军用头盔", type: "自闭头", level: 5, available_face_shields: ["SH通用防弹面罩"], price: 150000},
+            {name: "RSP重装战术头盔", type: "自闭头", level: 5, available_face_shields: ["DK5通用防弹面罩", "DK6安保防弹面罩", "DK8军用防弹面罩"], price: 340000},
+            {name: "6BNT型头盔", type: "自闭头", level: 6, available_face_shields: ["6BNT防爆面罩"], price: 420000},
+            {name: "RST特种部队头盔", type: "自闭头", level: 6, available_face_shields: ["RST特种部队面罩"], price: 510000},
+            {name: "HG84特攻型头盔", type: "自闭头", level: 6, available_face_shields: [], price: 340000},
+            {name: "SH65军用头盔", type: "自闭头", level: 6, available_face_shields: ["SH65军用面罩A型", "SH65军用面罩B型"], price: 610000},
+            {name: "DOD9型防爆头盔", type: "自闭头", level: 6, available_face_shields: [], price: 580000},
+        ];
+
+        const helmets = [...helmets_normal, ...helmets_sealed];
+
+        const face_shields = [
+            {name: "DK5通用防弹面罩", level: 2, price: 10000},
+            {name: "SH通用防弹面罩", level: 3, price: 9200},
+            {name: "DK6安保防弹面罩", level: 3, price: 24000},
+            {name: "SH60面罩", level: 4, price: 24000},
+            {name: "DK8军用防弹面罩", level: 4, price: 41000},
+            {name: "DK7高级防弹面罩", level: 4, price: 12000},
+            {name: "AN95军用防弹面罩", level: 4, price: 21000},
+            {name: "SH马斯卡面罩", level: 5, price: 69000},
+            {name: "SH65军用面罩A型", level: 5, price: 27000},
+            {name: "6BNT防爆面罩", level: 6, price: 56000},
+            {name: "SH65军用面罩B型", level: 6, price: 160000},
+            {name: "RST特种部队面罩", level: 6, price: 190000},
+        ];
+
+        const armors = [
+            {name: "老式工兵防弹胸甲", level: 1, price: 7900},
+            {name: "旧安保防弹衣", level: 1, price: 8800},
+            {name: "老式防弹马甲", level: 1, price: 8800},
+            {name: "安保防弹衣", level: 2, price: 10000},
+            {name: "老式步兵防弹背心", level: 2, price: 20000},
+            {name: "220防弹衣", level: 2, price: 11000},
+            {name: "H-LC轻型防弹衣", level: 3, price: 66000},
+            {name: "H-Tac特勤防弹衣", level: 3, price: 46000},
+            {name: "KN制式防弹衣", level: 3, price: 30000},
+            {name: "PCA350型防弹衣", level: 3, price: 38000},
+            {name: "KN突击防弹衣", level: 3, price: 80000},
+            {name: "标准特勤防弹衣", level: 3, price: 51000},
+            {name: "SEK堡垒防弹衣", level: 4, price: 100000},
+            {name: "6B 13防弹衣", level: 4, price: 120000},
+            {name: "6B23防弹衣", level: 4, price: 100000},
+            {name: "IND 401型防弹衣", level: 4, price: 100000},
+            {name: "斯巴达B型防弹衣", level: 4, price: 140000},
+            {name: "926 复合防弹衣", level: 5, price: 250000},
+            {name: "H-LC战术防弹衣", level: 5, price: 280000},
+            {name: "防卫者M4重装型防弹衣", level: 5, price: 280000},
+            {name: "防卫者M4重装型防弹衣士官涂装", level: 5, price: 290000},
+            {name: "IMTV 武士攻击型防弹衣", level: 5, price: 340000},
+            {name: "IMTV 武士标准防弹衣", level: 5, price: 330000},
+            {name: "IMTV 武士全面防护防弹衣", level: 5, price: 420000},
+            {name: "BT6重型防弹衣", level: 5, price: 570000},
+            {name: "BT101战术防弹衣", level: 6, price: 1100000},
+            {name: "6B45重装型防弹衣", level: 6, price: 1100000},
+            {name: "治安官重型防弹衣", level: 6, price: 1000000},
+            {name: "KN 复合防弹衣", level: 6, price: 1500000},
+        ];
+
+        const chest_rigs_no_armor = [
+            {name: "狩猎马甲", price: 3200},
+            {name: "ALS携行弹挂", price: 3400},
+            {name: "BH步兵胸挂", price: 2300},
+            {name: "朋克摩托背心", price: 4400},
+            {name: "牛皮摩托背心", price: 4700},
+            {name: "926轻型胸挂", price: 9400},
+            {name: "BH2型胸挂", price: 32000},
+            {name: "勤务战术背心", price: 33000},
+            {name: "RAP简易弹挂", price: 48000},
+            {name: "冲锋手2型弹挂", price: 42000},
+            {name: "926猎手背心", price: 50000},
+            {name: "B4战术弹挂", price: 70000},
+            {name: "B3通用弹挂", price: 70000},
+            {name: "FA多功能胸挂", price: 100000},
+            {name: "冲锋手4型战术弹挂", price: 100000},
+            {name: "冲锋手3型战术弹挂", price: 110000},
+            {name: "B6战术弹挂", price: 85000},
+            {name: "FA指挥官胸挂", price: 130000},
+            {name: "926高级野战胸挂", price: 140000},
+        ];
+
+        const armored_chest_rigs = [
+            {name: "M1955战斗马甲", level: 2, price: 24000},
+            {name: "6B5弹挂甲", level: 3, price: 89000},
+            {name: "哨兵3型胸挂甲", level: 3, price: 86000},
+            {name: "926安保胸挂甲", level: 3, price: 97000},
+            {name: "哨兵305胸挂甲", level: 4, price: 110000},
+            {name: "TM1胸挂甲", level: 4, price: 90000},
+            {name: "TM2胸挂甲", level: 4, price: 100000},
+            {name: "H-TacA8弹挂甲", level: 5, price: 210000},
+            {name: "勇士重型胸挂甲", level: 5, price: 230000},
+            {name: "H-TacA9弹挂甲", level: 5, price: 240000},
+            {name: "防卫者M4重装弹挂甲", level: 5, price: 340000},
+            {name: "斯巴达C重装弹挂甲", level: 6, price: 620000},
+            {name: "AL战术弹挂甲", level: 6, price: 670000},
+            {name: "AVS重装弹挂甲", level: 6, price: 730000},
+            {name: "AL指挥官弹挂甲", level: 6, price: 860000},
+            {name: "AL突击弹挂甲", level: 6, price: 860000},
+        ];
+
+        const backpacks = [
+            {name: "简易挎包", price: 3200},
+            {name: "轻型登山背包", price: 2200},
+            {name: "中型登山背包", price: 2400},
+            {name: "简易背包", price: 10000},
+            {name: "帆布背包", price: 11000},
+            {name: "帆布野营背囊", price: 33000},
+            {name: "运动背囊", price: 50000},
+            {name: "牛皮背包", price: 60000},
+            {name: "户外旅行背包", price: 62000},
+            {name: "RUSH战术背包", price: 69000},
+            {name: "大型登山背包", price: 64000},
+            {name: "XA4战术背包", price: 53000},
+            {name: "Med野战背包", price: 70000},
+            {name: "查普曼军用背包", price: 68000},
+            {name: "AMP7突击背包", price: 100000},
+            {name: "老式行军背囊", price: 68000},
+            {name: "LUC扩容战术背包", price: 130000},
+            {name: "926野战背包", price: 140000},
+            {name: "野战登山背包", price: 190000},
+            {name: "RAL重型军用背包", price: 200000},
+        ];
+
+        const ears = [
+            {name: "Com1战术耳机", price: 4600},
+            {name: "M32战术耳机", price: 21000},
+            {name: "Z038战术耳机", price: 40000},
+            {name: "指挥官A战术耳机", price: 82000},
+            {name: "GS2战术耳机", price: 84000},
+        ];
+
+        const gas_masks = [
+            {name: "SH-3型防毒面具", price: 20000},
+            {name: "RAL20野外防毒面具", price: 28000},
+            {name: "RAL全面罩防毒面具", price: 33000},
+            {name: "RAL10通用防毒面具", price: 33000},
+            {name: "SH-4型防毒面具", price: 35000},
+            {name: "RAL大目镜防毒面具", price: 45000},
+            {name: "RAL40高级防毒面具", price: 51000},
+        ];
+
+        const weapons = [
+            {name: "AKS74U突击步枪", type: "突击步枪", price: 4400},
+            {name: "SG550突击步枪", type: "突击步枪", price: 6700},
+            {name: "AKM突击步枪", type: "突击步枪", price: 11000},
+            {name: "AK74N突击步枪", type: "突击步枪", price: 9800},
+            {name: "PCC-9", type: "突击步枪", price: 24000},
+            {name: "FAL突击步枪", type: "突击步枪", price: 23000},
+            {name: "ACE31突击步枪", type: "突击步枪", price: 17000},
+            {name: "G3突击步枪", type: "突击步枪", price: 37000},
+            {name: "SCAR-L突击步枪", type: "突击步枪", price: 18000},
+            {name: "T951突击步枪", type: "突击步枪", price: 18000},
+            {name: "M4A1突击步枪", type: "突击步枪", price: 61000},
+            {name: "AK12突击步枪", type: "突击步枪", price: 44000},
+            {name: "ZC807突击步枪", type: "突击步枪", price: 44000},
+            {name: "AK102突击步枪", type: "突击步枪", price: 37000},
+            {name: "AMB-17突击步枪", type: "突击步枪", price: 49000},
+            {name: "MCX突击步枪", type: "突击步枪", price: 53000},
+            {name: "DTMDR突击步枪", type: "突击步枪", price: 57000},
+            {name: "T03突击步枪", type: "突击步枪", price: 66000},
+            {name: "AR57突击步枪", type: "突击步枪", price: 86000},
+            {name: "AN94突击步枪", type: "突击步枪", price: 69000},
+            {name: "F2000突击步枪", type: "突击步枪", price: 140000},
+            {name: "AEK突击步枪", type: "突击步枪", price: 93000},
+            {name: "AUG突击步枪", type: "突击步枪", price: 130000},
+            {name: "T191突击步枪", type: "突击步枪", price: 100000},
+            {name: "H416突击步枪", type: "突击步枪", price: 170000},
+            {name: "QC61微型冲锋枪", type: "冲锋枪", price: 4400},
+            {name: "UZI微型冲锋枪", type: "冲锋枪", price: 2400},
+            {name: "MPF45微型冲锋枪", type: "冲锋枪", price: 4600},
+            {name: "T79微型冲锋枪", type: "冲锋枪", price: 7400},
+            {name: "MP40微型冲锋枪", type: "冲锋枪", price: 7600},
+            {name: "M3A1微型冲锋枪", type: "冲锋枪", price: 7500},
+            {name: "UMP45微型冲锋枪", type: "冲锋枪", price: 5700},
+            {name: "MAC10微型冲锋枪", type: "冲锋枪", price: 12000},
+            {name: "T85微型冲锋枪", type: "冲锋枪", price: 18000},
+            {name: "MP5微型冲锋枪", type: "冲锋枪", price: 10000},
+            {name: "Vector45微型冲锋枪", type: "冲锋枪", price: 11000},
+            {name: "Vector9微型冲锋枪", type: "冲锋枪", price: 47000},
+            {name: "PP19-01冲锋枪", type: "冲锋枪", price: 18000},
+            {name: "MPX微型冲锋枪", type: "冲锋枪", price: 30000},
+            {name: "P90微型冲锋枪", type: "冲锋枪", price: 100000},
+            {name: "MP133弹枪", type: "霰弹枪", price: 6800},
+            {name: "M870弹枪", type: "霰弹枪", price: 11000},
+            {name: "SPR310双管猎枪", type: "霰弹枪", price: 11000},
+            {name: "S12K弹枪", type: "霰弹枪", price: 16000},
+            {name: "USAS12弹枪", type: "霰弹枪", price: 46000},
+            {name: "RPK16轻机枪", type: "轻机枪", price: 86000},
+            {name: "莫辛纳甘栓动步枪", type: "栓动步枪", price: 44000},
+            {name: "M24栓动步枪", type: "栓动步枪", price: 68000},
+            {name: "SJ16栓动步枪", type: "栓动步枪", price: 160000},
+            {name: "SVDS射手步枪", type: "射手步枪", price: 39000},
+            {name: "ML杠杆步枪", type: "射手步枪", price: 44000},
+            {name: "M110射手步枪", type: "射手步枪", price: 60000},
+            {name: "VSS射手步枪", type: "射手步枪", price: 43000},
+            {name: "U191射手步枪", type: "射手步枪", price: 190000},
+            {name: "MK14射手步枪", type: "射手步枪", price: 270000},
+            {name: "SA85M卡宾枪", type: "卡宾枪", price: 6900},
+            {name: "SKS卡宾枪", type: "卡宾枪", price: 6300},
+            {name: "BM59卡宾枪", type: "卡宾枪", price: 7200},
+            {name: "Mini14卡宾枪", type: "卡宾枪", price: 7900},
+            {name: "M16卡宾枪", type: "卡宾枪", price: 9500},
+            {name: "M14卡宾枪", type: "卡宾枪", price: 25000},
+            {name: "SVTU卡宾枪", type: "卡宾枪", price: 23000},
+            {name: "M1911手枪", type: "手枪", price: 3600},
+            {name: "T54手枪", type: "手枪", price: 3700},
+            {name: "G17手枪", type: "手枪", price: 4900},
+            {name: "M9A3手枪", type: "手枪", price: 3300},
+            {name: "M45A1手枪", type: "手枪", price: 3200},
+            {name: "T05手枪", type: "手枪", price: 9100},
+            {name: "CZ52手枪", type: "手枪", price: 3200},
+            {name: "沙漠之鹰手枪", type: "手枪", price: 9900},
+            {name: "F57手枪", type: "手枪", price: 18000},
+            {name: "G18C手枪", type: "手枪", price: 9000},
+            {name: "MP9微型冲锋枪", type: "手枪", price: 9300},
+            {name: "黄金沙鹰手枪", type: "手枪", price: 16000},
+        ];
+
+        // 自闭头列表
+        const sealed_helmet_names = new Set([
+            "摩托车头盔", "坦克兵防护帽", "飞行员头盔", "安保防暴头盔", "SH12军用头盔",
+            "56K型直升机头盔", "SH40军用头盔", "SH18军用头盔", "AN95重型防爆头盔",
+            "SH马斯卡2型头盔", "SH60军用头盔", "SH50军用头盔", "RSP重装战术头盔",
+            "6BNT型头盔", "RST特种部队头盔", "HG84特攻型头盔", "SH65军用头盔", "DOD9型防爆头盔"
+        ]);
+
+        // 冲突的头盔（与防毒面具）
+        const gas_mask_conflict_helmets = new Set([
+            "56K型直升机头盔", "DOD9型防爆头盔"
+        ]);
+
+        // ==================== 应用状态 ====================
+        let currentMode = 'blockade';
+        let bodyType = 'separate'; // 'armored' or 'separate'
+
+        const settings = {
+            body: { enabled: false, mode: 'random', specified: null },
+            helmet: { enabled: false, mode: 'random', specified: null },
+            faceShield: { enabled: false, mode: 'random', specified: null },
+            backpack: { enabled: false, mode: 'random', specified: null },
+            ear: { enabled: false, mode: 'random', specified: null },
+            gasMask: { enabled: false, mode: 'random', specified: null },
+            weapon: { enabled: false, mode: 'random', specified: null }
+        };
+
+        // ==================== DOM 元素 ====================
+        const modeBtns = document.querySelectorAll('.mode-btn');
+        const generateBtn = document.getElementById('generateBtn');
+        const warningBanner = document.getElementById('warningBanner');
+        const warningText = document.getElementById('warningText');
+        const equipmentGrid = document.getElementById('equipmentGrid');
+        const totalPriceEl = document.getElementById('totalPrice');
+
+        // 装备类别元素
+        const categories = {
+            body: {
+                toggle: document.getElementById('bodyToggle'),
+                modes: document.querySelector('[data-category="body"] .selection-modes'),
+                select: document.getElementById('bodySelect'),
+                armoredRadio: document.getElementById('armoredRigRadio'),
+                separateRadio: document.getElementById('separateRadio'),
+                conflict: null
+            },
+            helmet: {
+                toggle: document.getElementById('helmetToggle'),
+                modes: document.querySelector('[data-category="helmet"] .selection-modes'),
+                select: document.getElementById('helmetSelect'),
+                conflict: document.getElementById('helmetConflict')
+            },
+            faceShield: {
+                toggle: document.getElementById('faceShieldToggle'),
+                modes: document.querySelector('[data-category="faceShield"] .selection-modes'),
+                select: document.getElementById('faceShieldSelect'),
+                conflict: null
+            },
+            backpack: {
+                toggle: document.getElementById('backpackToggle'),
+                modes: document.querySelector('[data-category="backpack"] .selection-modes'),
+                select: document.getElementById('backpackSelect'),
+                conflict: null
+            },
+            ear: {
+                toggle: document.getElementById('earToggle'),
+                modes: document.querySelector('[data-category="ear"] .selection-modes'),
+                select: document.getElementById('earSelect'),
+                conflict: document.getElementById('earConflict')
+            },
+            gasMask: {
+                toggle: document.getElementById('gasMaskToggle'),
+                modes: document.querySelector('[data-category="gasMask"] .selection-modes'),
+                select: document.getElementById('gasMaskSelect'),
+                conflict: null
+            },
+            weapon: {
+                toggle: document.getElementById('weaponToggle'),
+                modes: document.querySelector('[data-category="weapon"] .selection-modes'),
+                select: document.getElementById('weaponSelect'),
+                conflict: null
+            }
+        };
+
+        // ==================== 初始化下拉菜单 ====================
+        function initSelects() {
+            // 头盔
+            categories.helmet.select.innerHTML = '<option value="">选择头盔...</option>';
+            helmets.forEach(h => {
+                const opt = document.createElement('option');
+                opt.value = h.name;
+                opt.textContent = `${h.name} (${h.type} - 等级${h.level})`;
+                categories.helmet.select.appendChild(opt);
+            });
+
+            // 面罩
+            categories.faceShield.select.innerHTML = '<option value="">选择面罩...</option>';
+            face_shields.forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f.name;
+                opt.textContent = `${f.name} (等级${f.level})`;
+                categories.faceShield.select.appendChild(opt);
+            });
+
+            // 背包
+            categories.backpack.select.innerHTML = '<option value="">选择背包...</option>';
+            backpacks.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b.name;
+                opt.textContent = `${b.name} (¥${b.price.toLocaleString()})`;
+                categories.backpack.select.appendChild(opt);
+            });
+
+            // 耳机
+            categories.ear.select.innerHTML = '<option value="">选择耳机...</option>';
+            ears.forEach(e => {
+                const opt = document.createElement('option');
+                opt.value = e.name;
+                opt.textContent = `${e.name} (¥${e.price.toLocaleString()})`;
+                categories.ear.select.appendChild(opt);
+            });
+
+            // 防毒面具
+            categories.gasMask.select.innerHTML = '<option value="">选择防毒面具...</option>';
+            gas_masks.forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g.name;
+                opt.textContent = `${g.name} (¥${g.price.toLocaleString()})`;
+                categories.gasMask.select.appendChild(opt);
+            });
+
+            // 枪械
+            categories.weapon.select.innerHTML = '<option value="">选择枪械...</option>';
+            weapons.forEach(w => {
+                const opt = document.createElement('option');
+                opt.value = w.name;
+                opt.textContent = `${w.name} (¥${w.price.toLocaleString()})`;
+                categories.weapon.select.appendChild(opt);
+            });
+        }
+
+        // 更新身体部位下拉菜单
+        function updateBodySelect() {
+            const select = categories.body.select;
+            select.innerHTML = '<option value="">选择装备...</option>';
+
+            if (bodyType === 'armored') {
+                armored_chest_rigs.forEach(r => {
+                    const opt = document.createElement('option');
+                    opt.value = r.name;
+                    opt.textContent = `${r.name} (有甲 - 等级${r.level})`;
+                    select.appendChild(opt);
+                });
+            } else {
+                select.innerHTML = `
+                    <option value="">选择装备...</option>
+                    <optgroup label="防弹衣">
+                        ${armors.map(a => `<option value="armor:${a.name}">${a.name} (等级${a.level})</option>`).join('')}
+                    </optgroup>
+                    <optgroup label="无甲弹挂">
+                        ${chest_rigs_no_armor.map(r => `<option value="rig:${r.name}">${r.name} (¥${r.price.toLocaleString()})</option>`).join('')}
+                    </optgroup>
+                `;
+            }
+        }
+
+        // ==================== 事件监听 ====================
+        // 模式选择
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                modeBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMode = btn.dataset.mode;
+                hideWarning();
+            });
+        });
+
+        // 身体类型切换
+        categories.body.armoredRadio.addEventListener('change', () => {
+            if (categories.body.armoredRadio.checked) {
+                bodyType = 'armored';
+                updateBodySelect();
+            }
+        });
+
+        categories.body.separateRadio.addEventListener('change', () => {
+            if (categories.body.separateRadio.checked) {
+                bodyType = 'separate';
+                updateBodySelect();
+            }
+        });
+
+        // 装备类别切换
+        Object.keys(categories).forEach(categoryName => {
+            const cat = categories[categoryName];
+
+            // 启用/禁用切换
+            cat.toggle.addEventListener('change', () => {
+                settings[categoryName].enabled = cat.toggle.checked;
+
+                const categoryEl = document.querySelector(`[data-category="${categoryName}"]`);
+                if (cat.toggle.checked) {
+                    categoryEl.classList.add('enabled');
+                    categoryEl.classList.remove('disabled');
+                } else {
+                    categoryEl.classList.remove('enabled');
+                    categoryEl.classList.add('disabled');
+                }
+
+                updateCategoryState(categoryName);
+                checkConflicts();
+            });
+
+            // 随机/指定切换
+            if (cat.modes) {
+                const modeBtns = cat.modes.querySelectorAll('.selection-mode');
+                modeBtns.forEach(modeBtn => {
+                    modeBtn.addEventListener('click', () => {
+                        modeBtns.forEach(b => b.classList.remove('active'));
+                        modeBtn.classList.add('active');
+                        settings[categoryName].mode = modeBtn.dataset.mode;
+                        updateCategoryState(categoryName);
+
+                        // 检查冲突并恢复被禁用的选项
+                        checkConflicts();
+
+                        // 如果是头盔模式改变，恢复耳机的可用状态
+                        if (categoryName === 'helmet') {
+                            if (categories.ear.toggle && categories.ear.toggle.disabled) {
+                                categories.ear.toggle.disabled = false;
+                            }
+                        }
+                    });
+                });
+            }
+
+            // 指定装备选择
+            if (cat.select) {
+                cat.select.addEventListener('change', () => {
+                    settings[categoryName].specified = cat.select.value;
+                    checkConflicts();
+
+                    // 如果是头盔选择改变，恢复耳机的可用状态
+                    if (categoryName === 'helmet') {
+                        if (categories.ear.toggle && categories.ear.toggle.disabled) {
+                            categories.ear.toggle.disabled = false;
+                        }
+                    }
+                });
+            }
+        });
+
+        // 更新类别状态
+        function updateCategoryState(categoryName) {
+            const cat = categories[categoryName];
+            const setting = settings[categoryName];
+
+            if (!cat.select) return;
+
+            if (setting.enabled && setting.mode === 'specified') {
+                cat.select.disabled = false;
+            } else {
+                cat.select.disabled = true;
+                cat.select.value = '';
+                setting.specified = null;
+            }
+        }
+
+        // 检查冲突
+        function checkConflicts() {
+            let warnings = [];
+
+            // 1. 检查头盔与耳机的冲突
+            if (settings.helmet.enabled && settings.ear.enabled && settings.helmet.specified) {
+                const helmetName = settings.helmet.specified;
+                if (sealed_helmet_names.has(helmetName)) {
+                    warnings.push(`${helmetName}与耳机冲突，请重新选择`);
+                }
+            }
+
+            // 2. 检查头盔与面罩的冲突
+            if (settings.helmet.enabled && settings.faceShield.enabled &&
+                settings.helmet.specified && settings.faceShield.specified) {
+                const helmetName = settings.helmet.specified;
+                const faceShieldName = settings.faceShield.specified;
+                const helmet = helmets.find(h => h.name === helmetName);
+
+                if (helmet && !helmet.available_face_shields.includes(faceShieldName)) {
+                    warnings.push(`${helmetName}与${faceShieldName}不匹配，请重新选择`);
+                }
+            }
+
+            // 3. 检查防毒面具的冲突
+            if (settings.gasMask.enabled) {
+                // 防毒面具与面罩冲突
+                if (settings.faceShield.enabled) {
+                    const faceShieldName = settings.faceShield.specified || "面罩";
+                    warnings.push(`防毒面具与${faceShieldName}冲突，请重新选择`);
+                }
+
+                // 防毒面具与头盔冲突
+                if (settings.helmet.enabled && settings.helmet.specified) {
+                    const helmetName = settings.helmet.specified;
+                    if (gas_mask_conflict_helmets.has(helmetName)) {
+                        warnings.push(`${helmetName}与防毒面具冲突，请重新选择`);
+                    }
+                }
+            }
+
+            // 显示警告
+            if (warnings.length > 0) {
+                showWarning(warnings.join('；'));
+            } else {
+                hideWarning();
+            }
+        }
+
+        // 显示警告
+        function showWarning(message) {
+            warningText.textContent = message;
+            warningBanner.classList.add('show');
+        }
+
+        // 隐藏警告
+        function hideWarning() {
+            warningBanner.classList.remove('show');
+        }
+
+        // ==================== 随机生成 ====================
+        generateBtn.addEventListener('click', generateEquipment);
+
+        function generateEquipment() {
+            hideWarning();
+
+            // 检查冲突
+            if (warningBanner.classList.contains('show')) {
+                showWarning("装备搭配冲突，请重新选择");
+                return;
+            }
+
+            const results = [];
+            let totalPrice = 0;
+            let attempts = 0;
+            const maxAttempts = 50;
+
+            while (attempts < maxAttempts) {
+                results.length = 0;
+                totalPrice = 0;
+
+                // 生成装备
+                const generated = generateSingleAttempt();
+
+                if (!generated) {
+                    // 冲突导致的失败
+                    attempts++;
+                    continue;
+                }
+
+                generated.forEach(item => {
+                    results.push(item);
+                    totalPrice += item.price;
+                });
+
+                // 检查价格区间
+                const inRange = checkPriceRange(totalPrice);
+
+                if (inRange) {
+                    break;
+                }
+
+                attempts++;
+            }
+
+            if (attempts >= maxAttempts) {
+                showWarning("战备值错误，请重新选择");
+                return;
+            }
+
+            // 显示结果
+            displayResults(results, totalPrice);
+        }
+
+        function generateSingleAttempt() {
+            const results = [];
+
+            // 检查指定装备的冲突
+            if (settings.helmet.enabled && settings.helmet.specified &&
+                settings.ear.enabled && settings.ear.specified) {
+                const helmetName = settings.helmet.specified;
+                if (sealed_helmet_names.has(helmetName)) {
+                    return null; // 头盔与耳机冲突
+                }
+            }
+
+            if (settings.helmet.enabled && settings.helmet.specified &&
+                settings.faceShield.enabled && settings.faceShield.specified) {
+                const helmetName = settings.helmet.specified;
+                const faceShieldName = settings.faceShield.specified;
+                const helmet = helmets.find(h => h.name === helmetName);
+
+                if (helmet && !helmet.available_face_shields.includes(faceShieldName)) {
+                    return null; // 头盔与面罩不匹配
+                }
+            }
+
+            if (settings.gasMask.enabled) {
+                if (settings.faceShield.enabled) {
+                    return null; // 防毒面具与面罩冲突
+                }
+
+                if (settings.helmet.enabled && settings.helmet.specified) {
+                    const helmetName = settings.helmet.specified;
+                    if (gas_mask_conflict_helmets.has(helmetName)) {
+                        return null; // 头盔与防毒面具冲突
+                    }
+                }
+            }
+
+            // 身体部位
+            if (settings.body.enabled) {
+                if (bodyType === 'armored') {
+                    // 有甲弹挂
+                    if (settings.body.mode === 'random') {
+                        const rig = getRandomItem(armored_chest_rigs);
+                        results.push({ ...rig, category: '有甲弹挂' });
+                    } else if (settings.body.specified) {
+                        const rig = armored_chest_rigs.find(r => r.name === settings.body.specified);
+                        if (rig) {
+                            results.push({ ...rig, category: '有甲弹挂' });
+                        }
+                    }
+                } else {
+                    // 护甲 + 无甲弹挂
+                    if (settings.body.mode === 'random') {
+                        const armor = getRandomItem(armors);
+                        results.push({ ...armor, category: '防弹衣' });
+                        const rig = getRandomItem(chest_rigs_no_armor);
+                        results.push({ ...rig, category: '弹挂' });
+                    } else if (settings.body.specified) {
+                        const val = settings.body.specified;
+                        if (val.startsWith('armor:')) {
+                            const armorName = val.substring(6);
+                            const armor = armors.find(a => a.name === armorName);
+                            if (armor) {
+                                results.push({ ...armor, category: '防弹衣' });
+                            }
+                            const rig = getRandomItem(chest_rigs_no_armor);
+                            results.push({ ...rig, category: '弹挂' });
+                        } else if (val.startsWith('rig:')) {
+                            const rigName = val.substring(4);
+                            const rig = chest_rigs_no_armor.find(r => r.name === rigName);
+                            if (rig) {
+                                results.push({ ...rig, category: '弹挂' });
+                            }
+                            const armor = getRandomItem(armors);
+                            results.push({ ...armor, category: '防弹衣' });
+                        }
+                    }
+                }
+            }
+
+            // 头盔
+            let selectedHelmet = null;
+            if (settings.helmet.enabled) {
+                if (settings.helmet.mode === 'random') {
+                    selectedHelmet = getRandomItem(helmets);
+                } else if (settings.helmet.specified) {
+                    selectedHelmet = helmets.find(h => h.name === settings.helmet.specified);
+                }
+                if (selectedHelmet) {
+                    results.push({ ...selectedHelmet, category: '头盔' });
+                }
+            }
+
+            // 面罩
+            let selectedFaceShield = null;
+            if (settings.faceShield.enabled) {
+                if (settings.faceShield.mode === 'random') {
+                    selectedFaceShield = getRandomItem(face_shields);
+                } else if (settings.faceShield.specified) {
+                    selectedFaceShield = face_shields.find(f => f.name === settings.faceShield.specified);
+                }
+                if (selectedFaceShield) {
+                    results.push({ ...selectedFaceShield, category: '面罩' });
+                }
+            }
+
+            // 背包
+            if (settings.backpack.enabled) {
+                if (settings.backpack.mode === 'random') {
+                    const item = getRandomItem(backpacks);
+                    results.push({ ...item, category: '背包' });
+                } else if (settings.backpack.specified) {
+                    const item = backpacks.find(b => b.name === settings.backpack.specified);
+                    if (item) {
+                        results.push({ ...item, category: '背包' });
+                    }
+                }
+            }
+
+            // 耳机（检查自闭头冲突）
+            if (settings.ear.enabled) {
+                const canUseEar = !selectedHelmet || selectedHelmet.type !== '自闭头';
+                if (canUseEar) {
+                    if (settings.ear.mode === 'random') {
+                        const item = getRandomItem(ears);
+                        results.push({ ...item, category: '耳机' });
+                    } else if (settings.ear.specified) {
+                        const item = ears.find(e => e.name === settings.ear.specified);
+                        if (item) {
+                            results.push({ ...item, category: '耳机' });
+                        }
+                    }
+                }
+            }
+
+            // 防毒面具（检查面罩和冲突头盔）
+            let canUseGasMask = true;
+            if (selectedFaceShield) {
+                canUseGasMask = false;
+            }
+            if (selectedHelmet && gas_mask_conflict_helmets.has(selectedHelmet.name)) {
+                canUseGasMask = false;
+            }
+
+            if (settings.gasMask.enabled && canUseGasMask) {
+                if (settings.gasMask.mode === 'random') {
+                    const item = getRandomItem(gas_masks);
+                    results.push({ ...item, category: '防毒面具' });
+                } else if (settings.gasMask.specified) {
+                    const item = gas_masks.find(g => g.name === settings.gasMask.specified);
+                    if (item) {
+                        results.push({ ...item, category: '防毒面具' });
+                    }
+                }
+            }
+
+            // 枪械
+            if (settings.weapon.enabled) {
+                if (settings.weapon.mode === 'random') {
+                    const item = getRandomItem(weapons);
+                    results.push({ ...item, category: '枪械' });
+                } else if (settings.weapon.specified) {
+                    const item = weapons.find(w => w.name === settings.weapon.specified);
+                    if (item) {
+                        results.push({ ...item, category: '枪械' });
+                    }
+                }
+            }
+
+            // 检查头盔和面罩兼容性
+            if (selectedHelmet && selectedFaceShield) {
+                if (!selectedHelmet.available_face_shields.includes(selectedFaceShield.name)) {
+                    // 不兼容时移除面罩，保留头盔
+                    results = results.filter(item => !(item.category === '面罩' && item.name === selectedFaceShield.name));
+                }
+            }
+
+            return results;
+        }
+
+        function getRandomItem(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        function checkPriceRange(price) {
+            switch (currentMode) {
+                case 'normal':
+                    return price < 450000;
+                case 'blockade':
+                    return price >= 150000 && price <= 1000000;
+                case 'enhanced':
+                    return price >= 450000;
+                default:
+                    return true;
+            }
+        }
+
+        function displayResults(results, totalPrice) {
+            // 更新总价格
+            totalPriceEl.textContent = '¥' + totalPrice.toLocaleString();
+
+            // 清空结果区域
+            equipmentGrid.innerHTML = '';
+
+            // 添加装备卡片
+            results.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'equipment-card';
+                card.style.animationDelay = `${index * 0.1}s`;
+
+                const levelBadge = item.level !== undefined
+                    ? `<span class="level-badge">LV${item.level}</span>`
+                    : '';
+
+                card.innerHTML = `
+                    <div>
+                        <div class="card-label">${item.category}</div>
+                        <div class="card-name">${item.name}</div>
+                    </div>
+                    <div class="card-price">
+                        ${levelBadge}
+                        <div class="price">¥${item.price.toLocaleString()}</div>
+                    </div>
+                `;
+
+                equipmentGrid.appendChild(card);
+            });
+        }
+
+        // ==================== 初始化 ====================
+        function init() {
+            initSelects();
+            updateBodySelect();
+
+            // 设置默认选中
+            categories.body.separateRadio.checked = true;
+        }
+
+        init();
+    </script>
+</body>
+</html>

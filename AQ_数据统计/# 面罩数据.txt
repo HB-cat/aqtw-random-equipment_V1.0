@@ -1,0 +1,20 @@
+# 面罩数据
+
+face_shields = [
+    {"name": "DK5通用防弹面罩", "level": 2, "available_helmets": [], "price": 10000},
+
+    {"name": "SH通用防弹面罩", "level": 3, "available_helmets": [], "price": 9200},
+    {"name": "DK6安保防弹面罩",  "level": 3, "available_helmets": [], "price": 24000},
+
+    {"name": "SH60面罩", "level": 4, "available_helmets": [], "price": 24000},
+    {"name": "DK8军用防弹面罩",  "level": 4, "available_helmets": [], "price": 41000},
+    {"name": "DK7高级防弹面罩", "level": 4, "available_helmets": [], "price": 12000},
+    {"name": "AN95军用防弹面罩", "level": 4, "available_helmets": [], "price": 21000},
+
+    {"name": "SH马斯卡面罩",  "level": 5, "available_helmets": [], "price": 69000},
+    {"name": "SH65军用面罩A型",  "level": 5, "available_helmets": [], "price": 27000},
+
+    {"name": "6BNT防爆面罩",  "level": 6, "available_helmets": [], "price": 56000},
+    {"name": "SH65军用面罩B型",  "level": 6, "available_helmets": [], "price": 160000},
+    {"name": "RST特种部队面罩",  "level": 6, "available_helmets": [], "price": 190000},
+]

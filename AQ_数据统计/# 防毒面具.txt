@@ -1,0 +1,11 @@
+# 防毒面具
+
+gas_masks = [
+    {"name": "SH-3型防毒面具", "price": 20000},     
+    {"name": "RAL20野外防毒面具", "price": 28000},   
+    {"name": "RAL全面罩防毒面具", "price": 33000},    
+    {"name": "RAL10通用防毒面具", "price": 33000},    
+    {"name": "SH-4型防毒面具", "price": 35000},      
+    {"name": "RAL大目镜防毒面具", "price": 45000},    
+    {"name": "RAL40高级防毒面具", "price": 51000},    
+]

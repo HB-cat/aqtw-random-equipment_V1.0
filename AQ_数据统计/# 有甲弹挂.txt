@@ -1,0 +1,24 @@
+# 有甲弹挂
+
+armored_chest_rigs = [
+    {"name": "M1955战斗马甲", "level": 2, "price": 24000},
+
+    {"name": "6B5弹挂甲", "level": 3, "price": 89000},
+    {"name": "哨兵3型胸挂甲", "level": 3, "price": 86000},
+    {"name": "926安保胸挂甲", "level": 3, "price": 97000},
+
+    {"name": "哨兵305胸挂甲", "level": 4, "price": 110000},
+    {"name": "TM1胸挂甲",  "level": 4, "price": 90000},
+    {"name": "TM2胸挂甲", "level": 4, "price": 100000},
+
+    {"name": "H-TacA8弹挂甲",  "level": 5, "price": 210000},
+    {"name": "勇士重型胸挂甲","level": 5, "price": 230000},
+    {"name": "H-TacA9弹挂甲", "level": 5, "price": 240000},
+    {"name": "防卫者M4重装弹挂甲","level": 5, "price": 340000},
+
+    {"name": "斯巴达C重装弹挂甲",  "level": 6, "price": 620000},
+    {"name": "AL战术弹挂甲", "level": 6, "price": 670000},
+    {"name": "AVS重装弹挂甲", "level": 6, "price": 730000},
+    {"name": "AL指挥官弹挂甲", "level": 6, "price": 860000},
+    {"name": "AL突击弹挂甲", "level": 6, "price": 860000},
+]

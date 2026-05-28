@@ -1,0 +1,188 @@
+# 暗区突围无限_装备数据库
+# 顺序：头盔、面罩、防弹衣、无甲弹挂、有甲弹挂、背包、耳机、防毒面具
+
+# ----------------------------- 头盔 -----------------------------
+# 普通头盔（21件，可搭配耳机）
+helmets_normal = [
+    {"name": "凯尔斯消防头盔", "type": "普通", "level": 1, "available_face_shields": [], "price": 4200},
+    {"name": "轻型安全头盔", "type": "普通", "level": 1, "available_face_shields": [], "price": 4700},
+    {"name": "老式军用头盔", "type": "普通", "level": 2, "available_face_shields": [], "price": 10000},
+    {"name": "老式钢盔", "type": "普通", "level": 2, "available_face_shields": [], "price": 6000},
+    {"name": "安保头盔", "type": "普通", "level": 2, "available_face_shields": [], "price": 12000},
+    {"name": "PAS标准头盔", "type": "普通", "level": 3, "available_face_shields": [], "price": 6600},
+    {"name": "PAS2型头盔", "type": "普通", "level": 3, "available_face_shields": [], "price": 25000},
+    {"name": "F70战术头盔", "type": "普通", "level": 3, "available_face_shields": ["DK5通用防弹面罩", "DK6安保防弹面罩"], "price": 41000},
+    {"name": "6B4型头盔", "type": "普通", "level": 3, "available_face_shields": [], "price": 36000},
+    {"name": "6B4型头盔小队涂装", "type": "普通", "level": 3, "available_face_shields": [], "price": 36000},
+    {"name": "6B5型头盔", "type": "普通", "level": 3, "available_face_shields": [], "price": 32000},
+    {"name": "IND战术头盔", "type": "普通", "level": 4, "available_face_shields": ["DK5通用防弹面罩", "DK6安保防弹面罩"], "price": 57000},
+    {"name": "IND战术头盔雪山版", "type": "普通", "level": 4, "available_face_shields": ["DK5通用防弹面罩", "DK6安保防弹面罩"], "price": 60000},
+    {"name": "IND200头盔", "type": "普通", "level": 4, "available_face_shields": ["DK5通用防弹面罩", "DK6安保防弹面罩"], "price": 50000},
+    {"name": "F80战术头盔", "type": "普通", "level": 4, "available_face_shields": [], "price": 49000},
+    {"name": "KSS战术头盔", "type": "普通", "level": 4, "available_face_shields": ["DK5通用防弹面罩", "DK6安保防弹面罩", "DK8军用防弹面罩"], "price": 100000},
+    {"name": "KSS2型头盔", "type": "普通", "level": 4, "available_face_shields": ["DK5通用防弹面罩", "DK6安保防弹面罩", "DK8军用防弹面罩"], "price": 100000},
+    {"name": "FA突击战术头盔", "type": "普通", "level": 5, "available_face_shields": [], "price": 250000},
+    {"name": "03重型战术头盔", "type": "普通", "level": 5, "available_face_shields": ["DK5通用防弹面罩", "DK6安保防弹面罩", "DK8军用防弹面罩"], "price": 330000},
+    {"name": "IND50重型战术头盔", "type": "普通", "level": 6, "available_face_shields": ["DK5通用防弹面罩", "DK6安保防弹面罩", "DK8军用防弹面罩"], "price": 480000},
+    {"name": "AS200重型战术头盔", "type": "普通", "level": 6, "available_face_shields": ["DK7高级防弹面罩"], "price": 500000},
+]
+
+# 自闭头（18件，不可再装备耳机）
+helmets_sealed = [
+    {"name": "摩托车头盔", "type": "自闭头", "level": 1, "available_face_shields": [], "price": 5000},
+    {"name": "坦克兵防护帽", "type": "自闭头", "level": 1, "available_face_shields": [], "price": 5200},
+    {"name": "飞行员头盔", "type": "自闭头", "level": 2, "available_face_shields": [], "price": 12000},
+    {"name": "安保防暴头盔", "type": "自闭头", "level": 2, "available_face_shields": [], "price": 12000},
+    {"name": "SH12军用头盔", "type": "自闭头", "level": 3, "available_face_shields": [], "price": 48000},
+    {"name": "56K型直升机头盔", "type": "自闭头", "level": 4, "available_face_shields": [], "price": 120000},
+    {"name": "SH40军用头盔", "type": "自闭头", "level": 4, "available_face_shields": ["SH60面罩"], "price": 21000},
+    {"name": "SH18军用头盔", "type": "自闭头", "level": 4, "available_face_shields": [], "price": 45000},
+    {"name": "AN95重型防爆头盔", "type": "自闭头", "level": 5, "available_face_shields": ["AN95军用防弹面罩"], "price": 400000},
+    {"name": "SH马斯卡2型头盔", "type": "自闭头", "level": 5, "available_face_shields": ["SH马斯卡面罩"], "price": 230000},
+    {"name": "SH60军用头盔", "type": "自闭头", "level": 5, "available_face_shields": ["SH60面罩"], "price": 160000},
+    {"name": "SH50军用头盔", "type": "自闭头", "level": 5, "available_face_shields": ["SH通用防弹面罩"], "price": 150000},
+    {"name": "RSP重装战术头盔", "type": "自闭头", "level": 5, "available_face_shields": ["DK5通用防弹面罩", "DK6安保防弹面罩", "DK8军用防弹面罩"], "price": 340000},
+    {"name": "6BNT型头盔", "type": "自闭头", "level": 6, "available_face_shields": ["6BNT防爆面罩"], "price": 420000},
+    {"name": "RST特种部队头盔", "type": "自闭头", "level": 6, "available_face_shields": ["RST特种部队面罩"], "price": 510000},
+    {"name": "HG84特攻型头盔", "type": "自闭头", "level": 6, "available_face_shields": [], "price": 340000},
+    {"name": "SH65军用头盔", "type": "自闭头", "level": 6, "available_face_shields": ["SH65军用面罩A型", "SH65军用面罩B型"], "price": 610000},
+    {"name": "DOD9型防爆头盔", "type": "自闭头", "level": 6, "available_face_shields": [], "price": 580000},
+]
+
+helmets = helmets_normal + helmets_sealed
+
+# ----------------------------- 面罩 -----------------------------
+face_shields = [
+    {"name": "DK5通用防弹面罩", "level": 2, "price": 10000},
+    {"name": "SH通用防弹面罩", "level": 3, "price": 9200},
+    {"name": "DK6安保防弹面罩", "level": 3, "price": 24000},
+    {"name": "SH60面罩", "level": 4, "price": 24000},
+    {"name": "DK8军用防弹面罩", "level": 4, "price": 41000},
+    {"name": "DK7高级防弹面罩", "level": 4, "price": 12000},
+    {"name": "AN95军用防弹面罩", "level": 4, "price": 21000},
+    {"name": "SH马斯卡面罩", "level": 5, "price": 69000},
+    {"name": "SH65军用面罩A型", "level": 5, "price": 27000},
+    {"name": "6BNT防爆面罩", "level": 6, "price": 56000},
+    {"name": "SH65军用面罩B型", "level": 6, "price": 160000},
+    {"name": "RST特种部队面罩", "level": 6, "price": 190000},
+]
+
+# ----------------------------- 防弹衣（护甲） -----------------------------
+armors = [
+    {"name": "老式工兵防弹胸甲", "level": 1, "price": 7900},
+    {"name": "旧安保防弹衣", "level": 1, "price": 8800},
+    {"name": "老式防弹马甲", "level": 1, "price": 8800},
+    {"name": "安保防弹衣", "level": 2, "price": 10000},
+    {"name": "老式步兵防弹背心", "level": 2, "price": 20000},
+    {"name": "220防弹衣", "level": 2, "price": 11000},
+    {"name": "H-LC轻型防弹衣", "level": 3, "price": 66000},
+    {"name": "H-Tac特勤防弹衣", "level": 3, "price": 46000},
+    {"name": "KN制式防弹衣", "level": 3, "price": 30000},
+    {"name": "PCA350型防弹衣", "level": 3, "price": 38000},
+    {"name": "KN突击防弹衣", "level": 3, "price": 80000},
+    {"name": "标准特勤防弹衣", "level": 3, "price": 51000},
+    {"name": "SEK堡垒防弹衣", "level": 4, "price": 100000},
+    {"name": "6B 13防弹衣", "level": 4, "price": 120000},
+    {"name": "6B23防弹衣", "level": 4, "price": 100000},
+    {"name": "IND 401型防弹衣", "level": 4, "price": 100000},
+    {"name": "斯巴达B型防弹衣", "level": 4, "price": 140000},
+    {"name": "926 复合防弹衣", "level": 5, "price": 250000},
+    {"name": "H-LC战术防弹衣", "level": 5, "price": 280000},
+    {"name": "防卫者M4重装型防弹衣", "level": 5, "price": 280000},
+    {"name": "防卫者M4重装型防弹衣士官涂装", "level": 5, "price": 290000},
+    {"name": "IMTV 武士攻击型防弹衣", "level": 5, "price": 340000},
+    {"name": "IMTV 武士标准防弹衣", "level": 5, "price": 330000},
+    {"name": "IMTV 武士全面防护防弹衣", "level": 5, "price": 420000},
+    {"name": "BT6重型防弹衣", "level": 5, "price": 570000},
+    {"name": "BT101战术防弹衣", "level": 6, "price": 1100000},
+    {"name": "6B45重装型防弹衣", "level": 6, "price": 1100000},
+    {"name": "治安官重型防弹衣", "level": 6, "price": 1000000},
+    {"name": "KN 复合防弹衣", "level": 6, "price": 1500000},
+]
+
+# ----------------------------- 无甲弹挂 -----------------------------
+chest_rigs_no_armor = [
+    {"name": "狩猎马甲", "price": 3200},
+    {"name": "ALS携行弹挂", "price": 3400},
+    {"name": "BH步兵胸挂", "price": 2300},
+    {"name": "朋克摩托背心", "price": 4400},
+    {"name": "牛皮摩托背心", "price": 4700},
+    {"name": "926轻型胸挂", "price": 9400},
+    {"name": "BH2型胸挂", "price": 32000},
+    {"name": "勤务战术背心", "price": 33000},
+    {"name": "RAP简易弹挂", "price": 48000},
+    {"name": "冲锋手2型弹挂", "price": 42000},
+    {"name": "926猎手背心", "price": 50000},
+    {"name": "B4战术弹挂", "price": 70000},
+    {"name": "B3通用弹挂", "price": 70000},
+    {"name": "FA多功能胸挂", "price": 100000},
+    {"name": "冲锋手4型战术弹挂", "price": 100000},
+    {"name": "冲锋手3型战术弹挂", "price": 110000},
+    {"name": "B6战术弹挂", "price": 85000},
+    {"name": "FA指挥官胸挂", "price": 130000},
+    {"name": "926高级野战胸挂", "price": 140000},
+]
+
+# ----------------------------- 有甲弹挂 -----------------------------
+armored_chest_rigs = [
+    {"name": "M1955战斗马甲", "level": 2, "price": 24000},
+    {"name": "6B5弹挂甲", "level": 3, "price": 89000},
+    {"name": "哨兵3型胸挂甲", "level": 3, "price": 86000},
+    {"name": "926安保胸挂甲", "level": 3, "price": 97000},
+    {"name": "哨兵305胸挂甲", "level": 4, "price": 110000},
+    {"name": "TM1胸挂甲", "level": 4, "price": 90000},
+    {"name": "TM2胸挂甲", "level": 4, "price": 100000},
+    {"name": "H-TacA8弹挂甲", "level": 5, "price": 210000},
+    {"name": "勇士重型胸挂甲", "level": 5, "price": 230000},
+    {"name": "H-TacA9弹挂甲", "level": 5, "price": 240000},
+    {"name": "防卫者M4重装弹挂甲", "level": 5, "price": 340000},
+    {"name": "斯巴达C重装弹挂甲", "level": 6, "price": 620000},
+    {"name": "AL战术弹挂甲", "level": 6, "price": 670000},
+    {"name": "AVS重装弹挂甲", "level": 6, "price": 730000},
+    {"name": "AL指挥官弹挂甲", "level": 6, "price": 860000},
+    {"name": "AL突击弹挂甲", "level": 6, "price": 860000},
+]
+
+# ----------------------------- 背包 -----------------------------
+backpacks = [
+    {"name": "简易挎包", "price": 3200},
+    {"name": "轻型登山背包", "price": 2200},
+    {"name": "中型登山背包", "price": 2400},
+    {"name": "简易背包", "price": 10000},
+    {"name": "帆布背包", "price": 11000},
+    {"name": "帆布野营背囊", "price": 33000},
+    {"name": "运动背囊", "price": 50000},
+    {"name": "牛皮背包", "price": 60000},
+    {"name": "户外旅行背包", "price": 62000},
+    {"name": "RUSH战术背包", "price": 69000},
+    {"name": "大型登山背包", "price": 64000},
+    {"name": "XA4战术背包", "price": 53000},
+    {"name": "Med野战背包", "price": 70000},
+    {"name": "查普曼军用背包", "price": 68000},
+    {"name": "AMP7突击背包", "price": 100000},
+    {"name": "老式行军背囊", "price": 68000},
+    {"name": "LUC扩容战术背包", "price": 130000},
+    {"name": "926野战背包", "price": 140000},
+    {"name": "野战登山背包", "price": 190000},
+    {"name": "RAL重型军用背包", "price": 200000},
+]
+
+# ----------------------------- 耳机 -----------------------------
+ears = [
+    {"name": "Com1战术耳机", "price": 4600},
+    {"name": "M32战术耳机", "price": 21000},
+    {"name": "Z038战术耳机", "price": 40000},
+    {"name": "指挥官A战术耳机", "price": 82000},
+    {"name": "GS2战术耳机", "price": 84000},
+]
+
+# ----------------------------- 防毒面具 -----------------------------
+gas_masks = [
+    {"name": "SH-3型防毒面具", "price": 20000},
+    {"name": "RAL20野外防毒面具", "price": 28000},
+    {"name": "RAL全面罩防毒面具", "price": 33000},
+    {"name": "RAL10通用防毒面具", "price": 33000},
+    {"name": "SH-4型防毒面具", "price": 35000},
+    {"name": "RAL大目镜防毒面具", "price": 45000},
+    {"name": "RAL40高级防毒面具", "price": 51000},
+]
