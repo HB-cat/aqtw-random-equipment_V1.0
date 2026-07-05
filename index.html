@@ -676,6 +676,15 @@
             vertical-align: middle;
         }
 
+        .warning-banner.notice {
+            background: linear-gradient(145deg, rgba(180, 150, 50, 0.2), rgba(160, 130, 40, 0.3));
+            border-color: rgba(220, 180, 60, 0.4);
+        }
+
+        .warning-banner.notice::before {
+            background: linear-gradient(180deg, #e8c840, #b89620);
+        }
+
         /* 冲突提示 */
         .conflict-warning {
             color: #ff6a6a;
@@ -837,6 +846,64 @@
             letter-spacing: 1px;
             box-shadow: 0 0 8px var(--glow-red);
         }
+
+        /* 使用说明 */
+        .instructions-panel {
+            margin-top: 30px;
+        }
+
+        .instructions-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .instructions-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 14px 16px;
+            border-radius: 4px;
+            border-left: 2px solid var(--border-red);
+            transition: all 0.2s ease;
+        }
+
+        .instruction-item:hover {
+            border-left-color: var(--primary-red);
+            background: rgba(227, 59, 26, 0.05);
+        }
+
+        .instruction-step {
+            flex-shrink: 0;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, var(--primary-red), var(--primary-red-dark));
+            color: #fff;
+            font-family: 'Black Ops One', sans-serif;
+            font-size: 0.85rem;
+            border-radius: 3px;
+            box-shadow: 0 0 10px var(--glow-red);
+        }
+
+        .instruction-desc {
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        .instruction-desc strong {
+            color: var(--text-primary);
+        }
     </style>
 </head>
 <body>
@@ -909,6 +976,7 @@
                             <div class="selection-mode" data-mode="specified">指定</div>
                         </div>
                         <select class="equipment-select" id="bodySelect" disabled></select>
+                        <select class="equipment-select" id="bodySelectRig" disabled style="display:none; margin-top:8px;"></select>
                     </div>
                 </div>
 
@@ -1031,6 +1099,33 @@
                             <p>点击"随机生成"按钮生成装备</p>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 使用说明 -->
+        <div class="panel instructions-panel">
+            <div class="corner-decoration top-left"></div>
+            <div class="corner-decoration top-right"></div>
+            <div class="corner-decoration bottom-left"></div>
+            <div class="corner-decoration bottom-right"></div>
+            <h2 class="panel-title">使用说明</h2>
+            <div class="instructions-content">
+                <div class="instruction-item">
+                    <div class="instruction-step">1</div>
+                    <div class="instruction-desc"><strong>选择模式</strong> — 普通模式（总价 &lt; 450,000）/ 封锁模式（150,000 ~ 1,000,000）/ 强化封锁模式（总价 ≥ 450,000）</div>
+                </div>
+                <div class="instruction-item">
+                    <div class="instruction-step">2</div>
+                    <div class="instruction-desc"><strong>勾选装备部位</strong> — 点击各部位的复选框，选择需要随机生成的装备类别。每个部位可设为「随机」或「指定」具体装备</div>
+                </div>
+                <div class="instruction-item">
+                    <div class="instruction-step">3</div>
+                    <div class="instruction-desc"><strong>注意冲突规则</strong> — 防毒面具与面罩互斥；自闭头不能搭配耳机；面罩需与头盔兼容；有甲弹挂与"护甲+无甲弹挂"互斥</div>
+                </div>
+                <div class="instruction-item">
+                    <div class="instruction-step">4</div>
+                    <div class="instruction-desc"><strong>点击生成</strong> — 系统将自动组合装备，最多尝试 50 次。若冲突或价格不达标，会显示具体失败原因</div>
                 </div>
             </div>
         </div>
@@ -1309,7 +1404,7 @@
         let bodyType = 'separate'; // 'armored' or 'separate'
 
         const settings = {
-            body: { enabled: false, mode: 'random', specified: null },
+            body: { enabled: false, mode: 'random', specified: null, specifiedArmor: null, specifiedRig: null },
             helmet: { enabled: false, mode: 'random', specified: null },
             faceShield: { enabled: false, mode: 'random', specified: null },
             backpack: { enabled: false, mode: 'random', specified: null },
@@ -1332,6 +1427,7 @@
                 toggle: document.getElementById('bodyToggle'),
                 modes: document.querySelector('[data-category="body"] .selection-modes'),
                 select: document.getElementById('bodySelect'),
+                selectRig: document.getElementById('bodySelectRig'),
                 armoredRadio: document.getElementById('armoredRigRadio'),
                 separateRadio: document.getElementById('separateRadio'),
                 conflict: null
@@ -1434,25 +1530,37 @@
         // 更新身体部位下拉菜单
         function updateBodySelect() {
             const select = categories.body.select;
-            select.innerHTML = '<option value="">选择装备...</option>';
+            const selectRig = categories.body.selectRig;
 
             if (bodyType === 'armored') {
+                // 有甲弹挂：只有一个下拉
+                select.innerHTML = '<option value="">选择有甲弹挂...</option>';
                 armored_chest_rigs.forEach(r => {
                     const opt = document.createElement('option');
                     opt.value = r.name;
-                    opt.textContent = `${r.name} (有甲 - 等级${r.level})`;
+                    opt.textContent = `${r.name} (等级${r.level})`;
                     select.appendChild(opt);
                 });
+                selectRig.style.display = 'none';
+                selectRig.disabled = true;
             } else {
-                select.innerHTML = `
-                    <option value="">选择装备...</option>
-                    <optgroup label="防弹衣">
-                        ${armors.map(a => `<option value="armor:${a.name}">${a.name} (等级${a.level})</option>`).join('')}
-                    </optgroup>
-                    <optgroup label="无甲弹挂">
-                        ${chest_rigs_no_armor.map(r => `<option value="rig:${r.name}">${r.name} (¥${r.price.toLocaleString()})</option>`).join('')}
-                    </optgroup>
-                `;
+                // 护甲 + 无甲弹挂：两个下拉
+                select.innerHTML = '<option value="">选择防弹衣...</option>';
+                armors.forEach(a => {
+                    const opt = document.createElement('option');
+                    opt.value = a.name;
+                    opt.textContent = `${a.name} (等级${a.level})`;
+                    select.appendChild(opt);
+                });
+
+                selectRig.innerHTML = '<option value="">选择无甲弹挂...</option>';
+                chest_rigs_no_armor.forEach(r => {
+                    const opt = document.createElement('option');
+                    opt.value = r.name;
+                    opt.textContent = `${r.name} (¥${r.price.toLocaleString()})`;
+                    selectRig.appendChild(opt);
+                });
+                selectRig.style.display = '';
             }
         }
 
@@ -1471,14 +1579,24 @@
         categories.body.armoredRadio.addEventListener('change', () => {
             if (categories.body.armoredRadio.checked) {
                 bodyType = 'armored';
+                // 清除 separate 模式的专用值
+                settings.body.specifiedArmor = null;
+                settings.body.specifiedRig = null;
+                categories.body.select.value = '';
+                categories.body.selectRig.value = '';
                 updateBodySelect();
+                updateCategoryState('body');
             }
         });
 
         categories.body.separateRadio.addEventListener('change', () => {
             if (categories.body.separateRadio.checked) {
                 bodyType = 'separate';
+                // 清除 armored 模式的专用值
+                settings.body.specified = null;
+                categories.body.select.value = '';
                 updateBodySelect();
+                updateCategoryState('body');
             }
         });
 
@@ -1499,8 +1617,30 @@
                     categoryEl.classList.add('disabled');
                 }
 
+                // 防毒面具 ↔ 面罩 互斥联动
+                if (cat.toggle.checked) {
+                    if (categoryName === 'faceShield' && settings.gasMask.enabled) {
+                        categories.gasMask.toggle.checked = false;
+                        settings.gasMask.enabled = false;
+                        document.querySelector('[data-category="gasMask"]').classList.remove('enabled');
+                        document.querySelector('[data-category="gasMask"]').classList.add('disabled');
+                        updateCategoryState('gasMask');
+                    } else if (categoryName === 'gasMask' && settings.faceShield.enabled) {
+                        categories.faceShield.toggle.checked = false;
+                        settings.faceShield.enabled = false;
+                        document.querySelector('[data-category="faceShield"]').classList.remove('enabled');
+                        document.querySelector('[data-category="faceShield"]').classList.add('disabled');
+                        updateCategoryState('faceShield');
+                    }
+                }
+
                 updateCategoryState(categoryName);
                 checkConflicts();
+
+                // 头盔切换 → 检查自闭头状态联动耳机
+                if (categoryName === 'helmet') {
+                    updateEarStateForHelmet();
+                }
             });
 
             // 随机/指定切换
@@ -1516,11 +1656,9 @@
                         // 检查冲突并恢复被禁用的选项
                         checkConflicts();
 
-                        // 如果是头盔模式改变，恢复耳机的可用状态
+                        // 头盔模式改变 → 检查自闭头状态联动耳机
                         if (categoryName === 'helmet') {
-                            if (categories.ear.toggle && categories.ear.toggle.disabled) {
-                                categories.ear.toggle.disabled = false;
-                            }
+                            updateEarStateForHelmet();
                         }
                     });
                 });
@@ -1530,14 +1668,24 @@
             if (cat.select) {
                 cat.select.addEventListener('change', () => {
                     settings[categoryName].specified = cat.select.value;
+                    // body separate 模式：主选是防弹衣
+                    if (categoryName === 'body' && bodyType === 'separate') {
+                        settings.body.specifiedArmor = cat.select.value;
+                    }
                     checkConflicts();
 
-                    // 如果是头盔选择改变，恢复耳机的可用状态
+                    // 头盔选择变更 → 检查自闭头状态联动耳机
                     if (categoryName === 'helmet') {
-                        if (categories.ear.toggle && categories.ear.toggle.disabled) {
-                            categories.ear.toggle.disabled = false;
-                        }
+                        updateEarStateForHelmet();
                     }
+                });
+            }
+
+            // body 无甲弹挂下拉变更
+            if (categoryName === 'body' && cat.selectRig) {
+                cat.selectRig.addEventListener('change', () => {
+                    settings.body.specifiedRig = cat.selectRig.value;
+                    checkConflicts();
                 });
             }
         });
@@ -1546,6 +1694,30 @@
         function updateCategoryState(categoryName) {
             const cat = categories[categoryName];
             const setting = settings[categoryName];
+
+            // 身体部位有双下拉特殊处理
+            if (categoryName === 'body') {
+                if (setting.enabled && setting.mode === 'specified') {
+                    cat.select.disabled = false;
+                    if (bodyType === 'separate') {
+                        cat.selectRig.style.display = '';
+                        cat.selectRig.disabled = false;
+                    } else {
+                        cat.selectRig.style.display = 'none';
+                        cat.selectRig.disabled = true;
+                    }
+                } else {
+                    cat.select.disabled = true;
+                    cat.select.value = '';
+                    cat.selectRig.style.display = 'none';
+                    cat.selectRig.disabled = true;
+                    cat.selectRig.value = '';
+                    setting.specified = null;
+                    setting.specifiedArmor = null;
+                    setting.specifiedRig = null;
+                }
+                return;
+            }
 
             if (!cat.select) return;
 
@@ -1558,9 +1730,32 @@
             }
         }
 
+        // 根据头盔状态自动禁用/启用耳机
+        function updateEarStateForHelmet() {
+            const earToggle = categories.ear.toggle;
+            if (!earToggle) return;
+
+            const isSealedSelected = settings.helmet.enabled &&
+                settings.helmet.mode === 'specified' &&
+                settings.helmet.specified &&
+                sealed_helmet_names.has(settings.helmet.specified);
+
+            if (isSealedSelected && settings.ear.enabled) {
+                // 自闭头已勾选 → 强制关闭并禁用耳机
+                earToggle.checked = false;
+                settings.ear.enabled = false;
+                document.querySelector('[data-category="ear"]').classList.remove('enabled');
+                document.querySelector('[data-category="ear"]').classList.add('disabled');
+                updateCategoryState('ear');
+            }
+
+            // 耳机本身不禁用，让用户自己知道不能同时选
+        }
+
         // 检查冲突
         function checkConflicts() {
             let warnings = [];
+            let notices = [];
 
             // 1. 检查头盔与耳机的冲突
             if (settings.helmet.enabled && settings.ear.enabled && settings.helmet.specified) {
@@ -1599,23 +1794,47 @@
                 }
             }
 
-            // 显示警告
+            // 4. 随机模式下的冲突提示（非阻塞，仅告知）
+            // 头盔随机 + 耳机随机 → 可能冲突导致生成失败
+            if (settings.helmet.enabled && settings.ear.enabled &&
+                settings.helmet.mode === 'random' && settings.ear.mode === 'random') {
+                notices.push('提示：头盔为随机模式时若抽到自闭头，将与耳机冲突导致生成失败');
+            }
+            // 头盔随机 + 面罩随机 → 可能不兼容
+            if (settings.helmet.enabled && settings.faceShield.enabled &&
+                settings.helmet.mode === 'random' && settings.faceShield.mode === 'random') {
+                notices.push('提示：随机面罩可能与随机头盔不兼容导致生成失败');
+            }
+            // 头盔随机 + 防毒面具 → 可能抽到冲突头盔
+            if (settings.helmet.enabled && settings.gasMask.enabled &&
+                settings.helmet.mode === 'random') {
+                notices.push('提示：随机头盔可能抽到与防毒面具冲突的型号导致生成失败');
+            }
+
+            // 显示警告（阻塞性冲突优先显示）
             if (warnings.length > 0) {
                 showWarning(warnings.join('；'));
+            } else if (notices.length > 0) {
+                showWarning(notices.join('；'), 'notice');
             } else {
                 hideWarning();
             }
         }
 
         // 显示警告
-        function showWarning(message) {
+        function showWarning(message, type) {
             warningText.textContent = message;
             warningBanner.classList.add('show');
+            if (type === 'notice') {
+                warningBanner.classList.add('notice');
+            } else {
+                warningBanner.classList.remove('notice');
+            }
         }
 
         // 隐藏警告
         function hideWarning() {
-            warningBanner.classList.remove('show');
+            warningBanner.classList.remove('show', 'notice');
         }
 
         // ==================== 随机生成 ====================
@@ -1624,231 +1843,171 @@
         function generateEquipment() {
             hideWarning();
 
-            // 检查冲突
-            if (warningBanner.classList.contains('show')) {
-                showWarning("装备搭配冲突，请重新选择");
-                return;
-            }
-
-            const results = [];
-            let totalPrice = 0;
             let attempts = 0;
             const maxAttempts = 50;
+            let lastConflict = '';
+            let conflictCount = 0;
+            let priceFailCount = 0;
 
             while (attempts < maxAttempts) {
-                results.length = 0;
-                totalPrice = 0;
+                const result = generateSingleAttempt();
 
-                // 生成装备
-                const generated = generateSingleAttempt();
-
-                if (!generated) {
-                    // 冲突导致的失败
+                if (result.conflict) {
+                    lastConflict = result.conflict;
+                    conflictCount++;
                     attempts++;
                     continue;
                 }
 
-                generated.forEach(item => {
-                    results.push(item);
-                    totalPrice += item.price;
-                });
+                const totalPrice = result.items.reduce((sum, item) => sum + item.price, 0);
 
-                // 检查价格区间
-                const inRange = checkPriceRange(totalPrice);
-
-                if (inRange) {
-                    break;
+                if (checkPriceRange(totalPrice)) {
+                    displayResults(result.items, totalPrice);
+                    return;
                 }
 
+                priceFailCount++;
                 attempts++;
             }
 
-            if (attempts >= maxAttempts) {
-                showWarning("战备值错误，请重新选择");
-                return;
+            // 50次重试耗尽，生成详细失败报告
+            const priceRanges = {
+                normal: '总价 < 450,000',
+                blockade: '150,000 ≤ 总价 ≤ 1,000,000',
+                enhanced: '总价 ≥ 450,000'
+            };
+
+            let detail = '生成失败：';
+            const reasons = [];
+
+            if (conflictCount > 0) {
+                reasons.push(`装备冲突（如：${lastConflict}）`);
+            }
+            if (priceFailCount > 0) {
+                reasons.push(`战备值不达标（当前模式要求：${priceRanges[currentMode]}）`);
+            }
+            if (reasons.length === 0) {
+                reasons.push('请调整装备类别开关或稍后再试');
             }
 
-            // 显示结果
-            displayResults(results, totalPrice);
+            detail += reasons.join('；');
+
+            showWarning(detail);
+            equipmentGrid.innerHTML = '<div class="empty-state"><div class="icon">🎯</div><p>点击"随机生成"按钮生成装备</p></div>';
+            totalPriceEl.textContent = '0';
+        }
+
+        // ==================== 按部位生成函数 ====================
+        function generateBody(results) {
+            if (!settings.body.enabled) return;
+
+            if (bodyType === 'armored') {
+                const rig = settings.body.mode === 'random'
+                    ? getRandomItem(armored_chest_rigs)
+                    : armored_chest_rigs.find(r => r.name === settings.body.specified);
+                if (rig) results.push({ ...rig, category: '有甲弹挂' });
+            } else {
+                // 护甲
+                const armor = settings.body.mode === 'random'
+                    ? getRandomItem(armors)
+                    : armors.find(a => a.name === settings.body.specifiedArmor);
+                if (armor) results.push({ ...armor, category: '防弹衣' });
+
+                // 无甲弹挂
+                const rig = settings.body.mode === 'random'
+                    ? getRandomItem(chest_rigs_no_armor)
+                    : chest_rigs_no_armor.find(r => r.name === settings.body.specifiedRig);
+                if (rig) results.push({ ...rig, category: '弹挂' });
+            }
+        }
+
+        function generateHelmet(results) {
+            if (!settings.helmet.enabled) return null;
+            const helmet = settings.helmet.mode === 'random'
+                ? getRandomItem(helmets)
+                : helmets.find(h => h.name === settings.helmet.specified);
+            if (helmet) results.push({ ...helmet, category: '头盔' });
+            return helmet || null;
+        }
+
+        function generateFaceShield(results) {
+            if (!settings.faceShield.enabled) return null;
+            const shield = settings.faceShield.mode === 'random'
+                ? getRandomItem(face_shields)
+                : face_shields.find(f => f.name === settings.faceShield.specified);
+            if (shield) results.push({ ...shield, category: '面罩' });
+            return shield || null;
+        }
+
+        function generateBackpack(results) {
+            if (!settings.backpack.enabled) return;
+            const item = settings.backpack.mode === 'random'
+                ? getRandomItem(backpacks)
+                : backpacks.find(b => b.name === settings.backpack.specified);
+            if (item) results.push({ ...item, category: '背包' });
+        }
+
+        function generateEar(results) {
+            if (!settings.ear.enabled) return;
+            const item = settings.ear.mode === 'random'
+                ? getRandomItem(ears)
+                : ears.find(e => e.name === settings.ear.specified);
+            if (item) results.push({ ...item, category: '耳机' });
+        }
+
+        function generateGasMask(results) {
+            if (!settings.gasMask.enabled) return;
+            const item = settings.gasMask.mode === 'random'
+                ? getRandomItem(gas_masks)
+                : gas_masks.find(g => g.name === settings.gasMask.specified);
+            if (item) results.push({ ...item, category: '防毒面具' });
+        }
+
+        function generateWeapon(results) {
+            if (!settings.weapon.enabled) return;
+            const item = settings.weapon.mode === 'random'
+                ? getRandomItem(weapons)
+                : weapons.find(w => w.name === settings.weapon.specified);
+            if (item) results.push({ ...item, category: '枪械' });
         }
 
         function generateSingleAttempt() {
             const results = [];
 
-            // 检查指定装备的冲突
-            if (settings.helmet.enabled && settings.helmet.specified &&
-                settings.ear.enabled && settings.ear.specified) {
-                const helmetName = settings.helmet.specified;
-                if (sealed_helmet_names.has(helmetName)) {
-                    return null; // 头盔与耳机冲突
-                }
+            generateBody(results);
+            const selectedHelmet = generateHelmet(results);
+            const selectedFaceShield = generateFaceShield(results);
+            generateBackpack(results);
+            generateEar(results);
+            generateGasMask(results);
+            generateWeapon(results);
+
+            // === 生成后统一冲突校验 ===
+            const earItem = results.find(r => r.category === '耳机');
+            const gasMaskItem = results.find(r => r.category === '防毒面具');
+
+            // 1. 自闭头 + 耳机
+            if (selectedHelmet && selectedHelmet.type === '自闭头' && earItem) {
+                return { conflict: `"${selectedHelmet.name}"（自闭头）不能搭配耳机"${earItem.name}"` };
             }
 
-            if (settings.helmet.enabled && settings.helmet.specified &&
-                settings.faceShield.enabled && settings.faceShield.specified) {
-                const helmetName = settings.helmet.specified;
-                const faceShieldName = settings.faceShield.specified;
-                const helmet = helmets.find(h => h.name === helmetName);
-
-                if (helmet && !helmet.available_face_shields.includes(faceShieldName)) {
-                    return null; // 头盔与面罩不匹配
-                }
+            // 2. 头盔 + 面罩 不兼容
+            if (selectedHelmet && selectedFaceShield &&
+                !selectedHelmet.available_face_shields.includes(selectedFaceShield.name)) {
+                return { conflict: `"${selectedHelmet.name}"不兼容面罩"${selectedFaceShield.name}"` };
             }
 
-            if (settings.gasMask.enabled) {
-                if (settings.faceShield.enabled) {
-                    return null; // 防毒面具与面罩冲突
-                }
-
-                if (settings.helmet.enabled && settings.helmet.specified) {
-                    const helmetName = settings.helmet.specified;
-                    if (gas_mask_conflict_helmets.has(helmetName)) {
-                        return null; // 头盔与防毒面具冲突
-                    }
-                }
+            // 3. 防毒面具 + 面罩
+            if (gasMaskItem && selectedFaceShield) {
+                return { conflict: `防毒面具"${gasMaskItem.name}"不能与面罩"${selectedFaceShield.name}"同时装备` };
             }
 
-            // 身体部位
-            if (settings.body.enabled) {
-                if (bodyType === 'armored') {
-                    // 有甲弹挂
-                    if (settings.body.mode === 'random') {
-                        const rig = getRandomItem(armored_chest_rigs);
-                        results.push({ ...rig, category: '有甲弹挂' });
-                    } else if (settings.body.specified) {
-                        const rig = armored_chest_rigs.find(r => r.name === settings.body.specified);
-                        if (rig) {
-                            results.push({ ...rig, category: '有甲弹挂' });
-                        }
-                    }
-                } else {
-                    // 护甲 + 无甲弹挂
-                    if (settings.body.mode === 'random') {
-                        const armor = getRandomItem(armors);
-                        results.push({ ...armor, category: '防弹衣' });
-                        const rig = getRandomItem(chest_rigs_no_armor);
-                        results.push({ ...rig, category: '弹挂' });
-                    } else if (settings.body.specified) {
-                        const val = settings.body.specified;
-                        if (val.startsWith('armor:')) {
-                            const armorName = val.substring(6);
-                            const armor = armors.find(a => a.name === armorName);
-                            if (armor) {
-                                results.push({ ...armor, category: '防弹衣' });
-                            }
-                            const rig = getRandomItem(chest_rigs_no_armor);
-                            results.push({ ...rig, category: '弹挂' });
-                        } else if (val.startsWith('rig:')) {
-                            const rigName = val.substring(4);
-                            const rig = chest_rigs_no_armor.find(r => r.name === rigName);
-                            if (rig) {
-                                results.push({ ...rig, category: '弹挂' });
-                            }
-                            const armor = getRandomItem(armors);
-                            results.push({ ...armor, category: '防弹衣' });
-                        }
-                    }
-                }
+            // 4. 防毒面具 + 冲突头盔
+            if (gasMaskItem && selectedHelmet && gas_mask_conflict_helmets.has(selectedHelmet.name)) {
+                return { conflict: `"${selectedHelmet.name}"不能与防毒面具"${gasMaskItem.name}"同时装备` };
             }
 
-            // 头盔
-            let selectedHelmet = null;
-            if (settings.helmet.enabled) {
-                if (settings.helmet.mode === 'random') {
-                    selectedHelmet = getRandomItem(helmets);
-                } else if (settings.helmet.specified) {
-                    selectedHelmet = helmets.find(h => h.name === settings.helmet.specified);
-                }
-                if (selectedHelmet) {
-                    results.push({ ...selectedHelmet, category: '头盔' });
-                }
-            }
-
-            // 面罩
-            let selectedFaceShield = null;
-            if (settings.faceShield.enabled) {
-                if (settings.faceShield.mode === 'random') {
-                    selectedFaceShield = getRandomItem(face_shields);
-                } else if (settings.faceShield.specified) {
-                    selectedFaceShield = face_shields.find(f => f.name === settings.faceShield.specified);
-                }
-                if (selectedFaceShield) {
-                    results.push({ ...selectedFaceShield, category: '面罩' });
-                }
-            }
-
-            // 背包
-            if (settings.backpack.enabled) {
-                if (settings.backpack.mode === 'random') {
-                    const item = getRandomItem(backpacks);
-                    results.push({ ...item, category: '背包' });
-                } else if (settings.backpack.specified) {
-                    const item = backpacks.find(b => b.name === settings.backpack.specified);
-                    if (item) {
-                        results.push({ ...item, category: '背包' });
-                    }
-                }
-            }
-
-            // 耳机（检查自闭头冲突）
-            if (settings.ear.enabled) {
-                const canUseEar = !selectedHelmet || selectedHelmet.type !== '自闭头';
-                if (canUseEar) {
-                    if (settings.ear.mode === 'random') {
-                        const item = getRandomItem(ears);
-                        results.push({ ...item, category: '耳机' });
-                    } else if (settings.ear.specified) {
-                        const item = ears.find(e => e.name === settings.ear.specified);
-                        if (item) {
-                            results.push({ ...item, category: '耳机' });
-                        }
-                    }
-                }
-            }
-
-            // 防毒面具（检查面罩和冲突头盔）
-            let canUseGasMask = true;
-            if (selectedFaceShield) {
-                canUseGasMask = false;
-            }
-            if (selectedHelmet && gas_mask_conflict_helmets.has(selectedHelmet.name)) {
-                canUseGasMask = false;
-            }
-
-            if (settings.gasMask.enabled && canUseGasMask) {
-                if (settings.gasMask.mode === 'random') {
-                    const item = getRandomItem(gas_masks);
-                    results.push({ ...item, category: '防毒面具' });
-                } else if (settings.gasMask.specified) {
-                    const item = gas_masks.find(g => g.name === settings.gasMask.specified);
-                    if (item) {
-                        results.push({ ...item, category: '防毒面具' });
-                    }
-                }
-            }
-
-            // 枪械
-            if (settings.weapon.enabled) {
-                if (settings.weapon.mode === 'random') {
-                    const item = getRandomItem(weapons);
-                    results.push({ ...item, category: '枪械' });
-                } else if (settings.weapon.specified) {
-                    const item = weapons.find(w => w.name === settings.weapon.specified);
-                    if (item) {
-                        results.push({ ...item, category: '枪械' });
-                    }
-                }
-            }
-
-            // 检查头盔和面罩兼容性
-            if (selectedHelmet && selectedFaceShield) {
-                if (!selectedHelmet.available_face_shields.includes(selectedFaceShield.name)) {
-                    // 不兼容时移除面罩，保留头盔
-                    results = results.filter(item => !(item.category === '面罩' && item.name === selectedFaceShield.name));
-                }
-            }
-
-            return results;
+            return { items: results };
         }
 
         function getRandomItem(array) {
@@ -1907,6 +2066,9 @@
 
             // 设置默认选中
             categories.body.separateRadio.checked = true;
+
+            // 初始化身体部位的下拉可见性
+            updateCategoryState('body');
         }
 
         init();
